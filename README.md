@@ -64,45 +64,6 @@ VitalTech es un sistema completo de gestión de citas médicas que permite admin
 - Bootstrap 5.3.2
 - jQuery 3.7.1
 
-## 🚀 Instalación y Configuración
-
-### Prerrequisitos
-
-- Java JDK 21 o superior
-- Maven 3.6+
-- MongoDB 4.4+ (local o MongoDB Atlas)
-- IDE (VS Code, IntelliJ IDEA, Eclipse)
-
-### Pasos de Instalación
-
-1. **Clonar el repositorio**
-   ```bash
-   git clone https://github.com/TU_USUARIO/vitaltech.git
-   cd vitaltech
-   ```
-
-2. **Configurar MongoDB**
-   
-   Edita `src/main/resources/application.properties`:
-   ```properties
-   spring.data.mongodb.uri=mongodb://localhost:27017/vitaltech
-   spring.data.mongodb.database=vitaltech
-   ```
-
-3. **Instalar dependencias**
-   ```bash
-   mvn clean install
-   ```
-
-4. **Ejecutar la aplicación**
-   ```bash
-   mvn spring-boot:run
-   ```
-
-5. **Acceder a la aplicación**
-   
-   Abre tu navegador en: `http://localhost:8080`
-
 ## 📁 Estructura del Proyecto
 
 ```
@@ -146,14 +107,6 @@ El sistema implementa Spring Security con:
 ## 👨‍💻 Autor
 
 Proyecto desarrollado para la Universidad
-
-## 📝 Licencia
-
-Este proyecto es de uso académico.
-
-## 📧 Contacto
-
-Para consultas o sugerencias sobre el proyecto, contactar a través del repositorio.
 
 ---
 
