@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor - Nuevo Horario</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #4facfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="card mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-0"><i class="bi bi-plus-circle text-primary"></i> Nuevo Horario</h3>
+                <small class="text-muted">Configura tu disponibilidad</small>
+            </div>
+            <div>
+                <a th:href="@{/doctor/horarios}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form th:action="@{/doctor/horarios/guardar}" th:object="${horario}" method="post">
+                        
+                        <!-- Día de la semana -->
+                        <div class="mb-4">
+                            <label for="diaSemana" class="form-label fw-bold">
+                                <i class="bi bi-calendar-week text-primary"></i> Día de la Semana *
+                            </label>
+                            <select class="form-select form-select-lg" id="diaSemana" th:field="*{diaSemana}" required>
+                                <option value="">Seleccionar día...</option>
+                                <option value="MONDAY">Lunes</option>
+                                <option value="TUESDAY">Martes</option>
+                                <option value="WEDNESDAY">Miércoles</option>
+                                <option value="THURSDAY">Jueves</option>
+                                <option value="FRIDAY">Viernes</option>
+                                <option value="SATURDAY">Sábado</option>
+                                <option value="SUNDAY">Domingo</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Horarios -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="horaInicio" class="form-label fw-bold">
+                                    <i class="bi bi-clock text-primary"></i> Hora de Inicio *
+                                </label>
+                                <input type="time" class="form-control form-control-lg" 
+                                       id="horaInicio" th:field="*{horaInicio}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="horaFin" class="form-label fw-bold">
+                                    <i class="bi bi-clock-fill text-primary"></i> Hora de Fin *
+                                </label>
+                                <input type="time" class="form-control form-control-lg" 
+                                       id="horaFin" th:field="*{horaFin}" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Duración de cita -->
+                        <div class="mb-4">
+                            <label for="duracionCita" class="form-label fw-bold">
+                                <i class="bi bi-hourglass-split text-primary"></i> Duración de Cita (minutos) *
+                            </label>
+                            <select class="form-select form-select-lg" id="duracionCita" th:field="*{duracionCita}" required>
+                                <option value="15">15 minutos</option>
+                                <option value="20">20 minutos</option>
+                                <option value="30" selected>30 minutos (recomendado)</option>
+                            </select>
+                            <small class="text-muted">La duración máxima permitida es de 30 minutos</small>
+                        </div>
+                        
+                        <!-- Estado -->
+                        <div class="form-check form-switch mb-4">
+                            <input class="form-check-input" type="checkbox" id="activo" 
+                                   th:field="*{activo}" checked>
+                            <label class="form-check-label fw-bold" for="activo">
+                                Horario Activo
+                            </label>
+                        </div>
+                        
+                        <!-- Info -->
+                        <div class="alert alert-info mb-4">
+                            <h6 class="fw-bold mb-2">
+                                <i class="bi bi-info-circle"></i> Información
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>Define tu disponibilidad para cada día de la semana</li>
+                                <li>Los pacientes podrán agendar citas en estos horarios</li>
+                                <li>Puedes crear un horario diferente para cada día</li>
+                                <li>La duración de cada cita no puede exceder 30 minutos</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/doctor/horarios}" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> Guardar Horario
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

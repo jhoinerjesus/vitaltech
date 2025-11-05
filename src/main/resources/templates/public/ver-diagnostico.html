@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('VitalTech - Diagnóstico')}"></head>
+<body>
+
+<!-- Navbar -->
+<div th:replace="~{fragments/layout :: navbar-public}"></div>
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center animate-fade-in">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-info text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-file-medical-fill"></i> Diagnóstico Médico
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <!-- Información del Paciente -->
+                    <div class="bg-light rounded p-3 mb-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-person-fill text-primary"></i> Datos del Paciente
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <strong>Nombre:</strong> 
+                                <span th:text="${paciente.nombreCompleto}"></span>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Documento:</strong> 
+                                <span th:text="${paciente.numeroDocumento}"></span>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Edad:</strong> 
+                                <span th:text="${paciente.edad} + ' años'"></span>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>Tipo de Sangre:</strong> 
+                                <span th:text="${paciente.informacionMedica?.tipoSangre ?: 'No especificado'}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Diagnóstico -->
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-clipboard2-pulse text-success"></i> Diagnóstico
+                    </h5>
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-0" th:text="${diagnostico.diagnostico}"></p>
+                    </div>
+                    
+                    <!-- Síntomas -->
+                    <div class="mb-4" th:if="${diagnostico.sintomas}">
+                        <h6 class="fw-bold">Síntomas:</h6>
+                        <p th:text="${diagnostico.sintomas}"></p>
+                    </div>
+                    
+                    <!-- Tratamiento -->
+                    <div class="mb-4" th:if="${diagnostico.tratamiento}">
+                        <h6 class="fw-bold">Tratamiento:</h6>
+                        <p th:text="${diagnostico.tratamiento}"></p>
+                    </div>
+                    
+                    <!-- Recomendaciones -->
+                    <div class="mb-4" th:if="${diagnostico.recomendaciones}">
+                        <h6 class="fw-bold">Recomendaciones:</h6>
+                        <p th:text="${diagnostico.recomendaciones}"></p>
+                    </div>
+                    
+                    <!-- Signos Vitales -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3" th:if="${diagnostico.presionArterial}">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-heart-pulse text-danger fs-3"></i>
+                                    <p class="mb-0 small text-muted">Presión Arterial</p>
+                                    <h6 class="fw-bold" th:text="${diagnostico.presionArterial}"></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3" th:if="${diagnostico.temperatura}">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-thermometer-half text-warning fs-3"></i>
+                                    <p class="mb-0 small text-muted">Temperatura</p>
+                                    <h6 class="fw-bold" th:text="${diagnostico.temperatura} + ' °C'"></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3" th:if="${diagnostico.frecuenciaCardiaca}">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-heart text-danger fs-3"></i>
+                                    <p class="mb-0 small text-muted">Frecuencia Cardíaca</p>
+                                    <h6 class="fw-bold" th:text="${diagnostico.frecuenciaCardiaca} + ' lpm'"></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3" th:if="${diagnostico.peso}">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-person text-primary fs-3"></i>
+                                    <p class="mb-0 small text-muted">Peso</p>
+                                    <h6 class="fw-bold" th:text="${diagnostico.peso} + ' kg'"></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fecha -->
+                    <div class="text-muted small">
+                        <i class="bi bi-calendar"></i> 
+                        Fecha del diagnóstico: 
+                        <span th:text="${#temporals.format(diagnostico.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></span>
+                    </div>
+                    
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a th:href="@{/consultar-diagnostico}" class="btn btn-outline-secondary btn-custom">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                        <a th:href="@{/registro-paciente}" class="btn btn-primary btn-custom">
+                            <i class="bi bi-person-plus"></i> Crear cuenta para ver más
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

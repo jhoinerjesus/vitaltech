@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor - Detalle de Cita</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #4facfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #4facfe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="card mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-0"><i class="bi bi-calendar-check text-primary"></i> Detalle de Cita</h3>
+            </div>
+            <div>
+                <a th:href="@{/doctor/citas}" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-primary">Cerrar Sesión</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alerts -->
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div class="row">
+        <!-- Información de la Cita -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Información de la Cita</h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Estado -->
+                    <div class="mb-3">
+                        <span th:switch="${cita.estado.name()}">
+                            <span th:case="'PROGRAMADA'" class="badge bg-warning text-dark fs-6">Programada</span>
+                            <span th:case="'CONFIRMADA'" class="badge bg-info fs-6">Confirmada</span>
+                            <span th:case="'COMPLETADA'" class="badge bg-success fs-6">Completada</span>
+                            <span th:case="*" class="badge bg-secondary fs-6">Cancelada</span>
+                        </span>
+                    </div>
+                    
+                    <!-- Fecha y Hora -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="bg-light p-3 rounded">
+                                <i class="bi bi-calendar3 fs-3 text-primary"></i>
+                                <p class="mb-1 mt-2 text-muted small">Fecha</p>
+                                <h6 class="mb-0 fw-bold" th:text="${#temporals.format(cita.horario.fecha, 'dd/MM/yyyy')}"></h6>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-light p-3 rounded">
+                                <i class="bi bi-clock fs-3 text-primary"></i>
+                                <p class="mb-1 mt-2 text-muted small">Horario</p>
+                                <h6 class="mb-0 fw-bold">
+                                    <span th:text="${#temporals.format(cita.horario.horaInicio, 'HH:mm')}"></span>
+                                    - 
+                                    <span th:text="${#temporals.format(cita.horario.horaFin, 'HH:mm')}"></span>
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Motivo -->
+                    <div class="mb-3" th:if="${cita.motivoConsulta}">
+                        <h6 class="fw-bold"><i class="bi bi-file-text text-primary"></i> Motivo de Consulta:</h6>
+                        <p class="mb-0" th:text="${cita.motivoConsulta}"></p>
+                    </div>
+                    
+                    <!-- Observaciones -->
+                    <div th:if="${cita.observaciones}">
+                        <h6 class="fw-bold"><i class="bi bi-chat-text text-primary"></i> Observaciones:</h6>
+                        <p class="mb-0" th:text="${cita.observaciones}"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Diagnóstico (si existe) -->
+            <div class="card" th:if="${diagnostico != null}">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-file-medical-fill"></i> Diagnóstico Realizado</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info mb-3">
+                        <h6 class="fw-bold">Diagnóstico:</h6>
+                        <p class="mb-0" th:text="${diagnostico.diagnostico}"></p>
+                    </div>
+                    
+                    <div class="mb-3" th:if="${diagnostico.sintomas}">
+                        <h6 class="fw-bold">Síntomas:</h6>
+                        <p class="mb-0" th:text="${diagnostico.sintomas}"></p>
+                    </div>
+                    
+                    <div class="mb-3" th:if="${diagnostico.tratamiento}">
+                        <h6 class="fw-bold">Tratamiento:</h6>
+                        <p class="mb-0" th:text="${diagnostico.tratamiento}"></p>
+                    </div>
+                    
+                    <div th:if="${diagnostico.recomendaciones}">
+                        <h6 class="fw-bold">Recomendaciones:</h6>
+                        <p class="mb-0" th:text="${diagnostico.recomendaciones}"></p>
+                    </div>
+                    
+                    <!-- Signos Vitales -->
+                    <div class="row mt-3" th:if="${diagnostico.presionArterial != null or diagnostico.temperatura != null}">
+                        <div class="col-md-3" th:if="${diagnostico.presionArterial}">
+                            <div class="text-center bg-light p-2 rounded">
+                                <small class="text-muted">Presión</small>
+                                <p class="mb-0 fw-bold" th:text="${diagnostico.presionArterial}"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" th:if="${diagnostico.temperatura}">
+                            <div class="text-center bg-light p-2 rounded">
+                                <small class="text-muted">Temperatura</small>
+                                <p class="mb-0 fw-bold" th:text="${diagnostico.temperatura} + '°C'"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" th:if="${diagnostico.frecuenciaCardiaca}">
+                            <div class="text-center bg-light p-2 rounded">
+                                <small class="text-muted">FC</small>
+                                <p class="mb-0 fw-bold" th:text="${diagnostico.frecuenciaCardiaca} + ' lpm'"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" th:if="${diagnostico.peso}">
+                            <div class="text-center bg-light p-2 rounded">
+                                <small class="text-muted">Peso</small>
+                                <p class="mb-0 fw-bold" th:text="${diagnostico.peso} + ' kg'"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información del Paciente -->
+        <div class="col-lg-4">
+            <div class="card" th:if="${paciente != null}">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-person-fill text-primary"></i> Paciente</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="avatar-circle mx-auto mb-2">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0" th:text="${paciente.nombreCompleto}"></h5>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-2">
+                        <small class="text-muted"><i class="bi bi-credit-card-2-front"></i> Documento</small>
+                        <p class="mb-0 fw-bold" th:text="${paciente.numeroDocumento}"></p>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <small class="text-muted"><i class="bi bi-envelope"></i> Email</small>
+                        <p class="mb-0" th:text="${paciente.email}"></p>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <small class="text-muted"><i class="bi bi-telephone"></i> Teléfono</small>
+                        <p class="mb-0" th:text="${paciente.telefono}"></p>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <small class="text-muted"><i class="bi bi-calendar-event"></i> Edad</small>
+                        <p class="mb-0" th:text="${paciente.edad} + ' años'"></p>
+                    </div>
+                    
+                    <div class="mb-2" th:if="${paciente.informacionMedica != null and paciente.informacionMedica.tipoSangre != null}">
+                        <small class="text-muted"><i class="bi bi-droplet-fill text-danger"></i> Tipo de Sangre</small>
+                        <p class="mb-0 fw-bold" th:text="${paciente.informacionMedica.tipoSangre}"></p>
+                    </div>
+                    
+                    <div th:if="${paciente.informacionMedica != null and paciente.informacionMedica.alergias != null and !paciente.informacionMedica.alergias.empty}">
+                        <small class="text-muted"><i class="bi bi-exclamation-triangle text-warning"></i> Alergias</small>
+                        <div class="alert alert-warning py-1 px-2 mt-1">
+                            <small th:each="alergia, iterStat : ${paciente.informacionMedica.alergias}">
+                                <span th:text="${alergia}"></span>
+                                <span th:if="${!iterStat.last}">, </span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Acciones -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a th:href="@{/doctor/citas}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver a Citas
+                        </a>
+                        <a th:href="@{/doctor/citas/{id}/diagnostico(id=${cita.id})}" 
+                           class="btn btn-primary"
+                           th:if="${diagnostico == null and (cita.estado.name() == 'CONFIRMADA' or cita.estado.name() == 'PROGRAMADA')}">
+                            <i class="bi bi-file-medical"></i> Crear Diagnóstico
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

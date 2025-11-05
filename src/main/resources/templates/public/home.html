@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('VitalTech - Inicio')}"></head>
+<body>
+
+<!-- Navbar -->
+<div th:replace="~{fragments/layout :: navbar-public}"></div>
+
+<!-- Hero Section -->
+<div class="container mt-5 animate-fade-in">
+    <div class="row align-items-center min-vh-75">
+        <div class="col-lg-6 text-white mb-4">
+            <h1 class="display-3 fw-bold mb-4">
+                Bienvenido a <span class="text-warning">VitalTech</span>
+            </h1>
+            <p class="lead mb-4">
+                Tu salud es nuestra prioridad. Gestiona tus citas médicas de forma rápida, 
+                sencilla y segura desde cualquier lugar.
+            </p>
+            <div class="d-flex gap-3 flex-wrap">
+                <a th:href="@{/registro-paciente}" class="btn btn-warning btn-lg btn-custom">
+                    <i class="bi bi-person-plus"></i> Registrarse
+                </a>
+                <a th:href="@{/login}" class="btn btn-light btn-lg btn-custom">
+                    <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card bg-white p-4">
+                <div class="card-body text-center">
+                    <i class="bi bi-hospital display-1 text-primary mb-3"></i>
+                    <h3 class="mb-3">¿Ya tienes una cita?</h3>
+                    <p class="text-muted mb-4">
+                        Consulta tu último diagnóstico sin necesidad de registrarte
+                    </p>
+                    <a th:href="@{/consultar-diagnostico}" class="btn btn-primary btn-custom">
+                        <i class="bi bi-file-medical"></i> Consultar Diagnóstico
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Características -->
+<div class="container my-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 bg-white">
+                <div class="card-body text-center p-4">
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                        <i class="bi bi-calendar-check display-4 text-primary"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Agenda tu Cita</h5>
+                    <p class="card-text text-muted">
+                        Reserva citas médicas en minutos con nuestros especialistas
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 bg-white">
+                <div class="card-body text-center p-4">
+                    <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                        <i class="bi bi-clipboard2-pulse display-4 text-success"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Historial Médico</h5>
+                    <p class="card-text text-muted">
+                        Accede a todos tus diagnósticos y consultas anteriores
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 bg-white">
+                <div class="card-body text-center p-4">
+                    <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-inline-block mb-3">
+                        <i class="bi bi-shield-check display-4 text-danger"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Seguro y Confiable</h5>
+                    <p class="card-text text-muted">
+                        Tus datos médicos protegidos con los más altos estándares
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div th:replace="~{fragments/layout :: footer}"></div>
+
+<!-- Scripts -->
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

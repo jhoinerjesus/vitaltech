@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('VitalTech - Registro de Paciente')}"></head>
+<body>
+
+<!-- Navbar -->
+<div th:replace="~{fragments/layout :: navbar-public}"></div>
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center animate-fade-in">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus-fill text-success display-3"></i>
+                        <h2 class="fw-bold mt-3">Registro de Paciente</h2>
+                        <p class="text-muted">Completa tus datos para crear tu cuenta</p>
+                    </div>
+                    
+                    <!-- Mensajes de alerta -->
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    <!-- Formulario -->
+                    <form th:action="@{/registro-paciente}" th:object="${usuario}" method="post">
+                        
+                        <!-- Información Personal -->
+                        <h5 class="fw-bold mb-3 text-primary">
+                            <i class="bi bi-person-badge"></i> Información Personal
+                        </h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="numeroDocumento" class="form-label">Número de Documento *</label>
+                                <input type="text" class="form-control" id="numeroDocumento" 
+                                       th:field="*{numeroDocumento}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
+                                <input type="date" class="form-control" id="fechaNacimiento" 
+                                       th:field="*{fechaNacimiento}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="nombre" class="form-label">Nombres *</label>
+                                <input type="text" class="form-control" id="nombre" 
+                                       th:field="*{nombre}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="apellido" class="form-label">Apellidos *</label>
+                                <input type="text" class="form-control" id="apellido" 
+                                       th:field="*{apellido}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="genero" class="form-label">Género *</label>
+                                <select class="form-select" id="genero" th:field="*{genero}" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Femenino">Femenino</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="telefono" class="form-label">Teléfono *</label>
+                                <input type="tel" class="form-control" id="telefono" 
+                                       th:field="*{telefono}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="email" class="form-label">Correo Electrónico *</label>
+                            <input type="email" class="form-control" id="email" 
+                                   th:field="*{email}" required>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Dirección -->
+                        <h5 class="fw-bold mb-3 text-primary">
+                            <i class="bi bi-geo-alt-fill"></i> Dirección
+                        </h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="direccion.calle" class="form-label">Calle</label>
+                                <input type="text" class="form-control" id="direccion.calle" 
+                                       th:field="*{direccion.calle}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="direccion.numero" class="form-label">Número</label>
+                                <input type="text" class="form-control" id="direccion.numero" 
+                                       th:field="*{direccion.numero}">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="direccion.ciudad" class="form-label">Ciudad</label>
+                                <input type="text" class="form-control" id="direccion.ciudad" 
+                                       th:field="*{direccion.ciudad}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="direccion.departamento" class="form-label">Departamento</label>
+                                <input type="text" class="form-control" id="direccion.departamento" 
+                                       th:field="*{direccion.departamento}">
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Credenciales -->
+                        <h5 class="fw-bold mb-3 text-primary">
+                            <i class="bi bi-shield-lock-fill"></i> Credenciales de Acceso
+                        </h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="username" class="form-label">Usuario *</label>
+                                <input type="text" class="form-control" id="username" 
+                                       th:field="*{username}" required>
+                                <small class="text-muted">Este será tu nombre de usuario para iniciar sesión</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">Contraseña *</label>
+                                <input type="password" class="form-control" id="password" 
+                                       th:field="*{password}" required>
+                                <small class="text-muted">Mínimo 6 caracteres</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Botones -->
+                        <div class="d-flex gap-3 justify-content-between mt-4">
+                            <a th:href="@{/login}" class="btn btn-outline-secondary btn-custom">
+                                <i class="bi bi-arrow-left"></i> Volver
+                            </a>
+                            <button type="submit" class="btn btn-success btn-custom">
+                                <i class="bi bi-check-circle"></i> Registrarse
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>
