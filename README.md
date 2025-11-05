@@ -112,4 +112,4 @@ Proyecto desarrollado para la Universidad
 
 **Estado del Proyecto:** 🚧 En Desarrollo
 
-**Última actualización:** Octubre 2025
+**Última actualización:** Noviembre 2025
