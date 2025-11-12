@@ -1,8 +1,5 @@
 package com.universidad.vitaltech.model;
 
-/**
- * Enumeración de estados de una cita médica
- */
 public enum EstadoCita {
     PROGRAMADA("Programada"),
     CONFIRMADA("Confirmada"),

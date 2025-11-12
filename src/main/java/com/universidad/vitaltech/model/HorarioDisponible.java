@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entidad HorarioDisponible - Gestiona la disponibilidad de los doctores
+ Entidad HorarioDisponible - Gestiona la disponibilidad de los doctores
  */
 @Document(collection = "horarios_disponibles")
 @Data

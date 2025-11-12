@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Paciente - VitalTech</title>
+
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #764ba2;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .info-card h4 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #f0f0f0;
+        }
+
+        .patient-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-row {
+            display: flex;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #7f8c8d;
+            min-width: 180px;
+        }
+
+        .info-value {
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .badge-programada { background: #ffc107; color: #000; }
+        .badge-confirmada { background: #17a2b8; color: #fff; }
+        .badge-completada { background: #28a745; color: #fff; }
+        .badge-cancelada { background: #dc3545; color: #fff; }
+
+        .table thead {
+            background: #f8f9fa;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a th:href="@{/recepcionista/dashboard}" class="navbar-brand fw-bold">
+            <i class="bi bi-hospital me-2"></i>
+            VitalTech
+        </a>
+        <div class="d-flex align-items-center">
+            <span class="text-white me-3 d-none d-md-inline">
+                <i class="bi bi-person-circle me-1"></i>
+                Recepcionista
+            </span>
+            <a class="btn btn-outline-light btn-sm" th:href="@{/logout}">
+                <i class="bi bi-box-arrow-right me-1"></i>
+                Cerrar Sesión
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="content-container">
+
+    <!-- Header del Paciente -->
+    <div class="patient-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 th:text="${paciente.nombreCompleto}">Nombre del Paciente</h2>
+                <p class="mb-1">
+                    <i class="bi bi-card-text me-2"></i>
+                    Documento: <strong th:text="${paciente.numeroDocumento}"></strong>
+                </p>
+                <p class="mb-0">
+                    <i class="bi bi-calendar3 me-2"></i>
+                    Edad: <strong th:text="${paciente.edad} + ' años'"></strong>
+                </p>
+            </div>
+            <div>
+                <a th:href="@{/recepcionista/pacientes}" class="btn btn-light">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información Personal -->
+        <div class="col-lg-6">
+            <div class="info-card">
+                <h4>
+                    <i class="bi bi-person-vcard me-2"></i>
+                    Información Personal
+                </h4>
+                
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="bi bi-envelope me-2"></i>
+                        Email
+                    </div>
+                    <div class="info-value" th:text="${paciente.email}"></div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="bi bi-phone me-2"></i>
+                        Teléfono
+                    </div>
+                    <div class="info-value" th:text="${paciente.telefono}"></div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="bi bi-calendar3 me-2"></i>
+                        Fecha de Nacimiento
+                    </div>
+                    <div class="info-value" th:text="${#temporals.format(paciente.fechaNacimiento, 'dd/MM/yyyy')}"></div>
+                </div>
+
+                <div class="info-row" th:if="${paciente.genero != null and paciente.genero != ''}">
+                    <div class="info-label">
+                        <i class="bi bi-gender-ambiguous me-2"></i>
+                        Género
+                    </div>
+                    <div class="info-value" th:text="${paciente.genero}"></div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Registrado
+                    </div>
+                    <div class="info-value" th:text="${#temporals.format(paciente.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información Médica -->
+        <div class="col-lg-6">
+            <div class="info-card">
+                <h4>
+                    <i class="bi bi-heart-pulse me-2"></i>
+                    Información Médica
+                </h4>
+
+                <div th:if="${paciente.informacionMedica != null}">
+                    <div class="info-row" th:if="${paciente.informacionMedica.tipoSangre != null and paciente.informacionMedica.tipoSangre != ''}">
+                        <div class="info-label">
+                            <i class="bi bi-droplet me-2"></i>
+                            Tipo de Sangre
+                        </div>
+                        <div class="info-value">
+                            <span class="badge bg-danger" th:text="${paciente.informacionMedica.tipoSangre}"></span>
+                        </div>
+                    </div>
+
+                    <div class="info-row" th:if="${paciente.informacionMedica.alergias != null and !paciente.informacionMedica.alergias.isEmpty()}">
+                        <div class="info-label">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Alergias
+                        </div>
+                        <div class="info-value">
+                            <span th:each="alergia, iterStat : ${paciente.informacionMedica.alergias}">
+                                <span th:text="${alergia}"></span>
+                                <span th:if="${!iterStat.last}">, </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-row" th:if="${paciente.informacionMedica.enfermedadesCronicas != null and !paciente.informacionMedica.enfermedadesCronicas.isEmpty()}">
+                        <div class="info-label">
+                            <i class="bi bi-clipboard-pulse me-2"></i>
+                            Enfermedades Crónicas
+                        </div>
+                        <div class="info-value">
+                            <span th:each="enfermedad, iterStat : ${paciente.informacionMedica.enfermedadesCronicas}">
+                                <span th:text="${enfermedad}"></span>
+                                <span th:if="${!iterStat.last}">, </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-row" th:if="${paciente.informacionMedica.medicamentosActuales != null and !paciente.informacionMedica.medicamentosActuales.isEmpty()}">
+                        <div class="info-label">
+                            <i class="bi bi-capsule me-2"></i>
+                            Medicamentos
+                        </div>
+                        <div class="info-value">
+                            <span th:each="medicamento, iterStat : ${paciente.informacionMedica.medicamentosActuales}">
+                                <span th:text="${medicamento}"></span>
+                                <span th:if="${!iterStat.last}">, </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-row" th:if="${paciente.informacionMedica.contactoEmergencia != null and paciente.informacionMedica.contactoEmergencia != ''}">
+                        <div class="info-label">
+                            <i class="bi bi-person-exclamation me-2"></i>
+                            Contacto Emergencia
+                        </div>
+                        <div class="info-value">
+                            <div th:text="${paciente.informacionMedica.contactoEmergencia}"></div>
+                            <small class="text-muted" th:if="${paciente.informacionMedica.telefonoEmergencia != null and paciente.informacionMedica.telefonoEmergencia != ''}">
+                                <i class="bi bi-telephone"></i>
+                                <span th:text="${paciente.informacionMedica.telefonoEmergencia}"></span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${paciente.informacionMedica == null}" class="text-muted text-center py-3">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No hay información médica registrada
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial de Citas -->
+    <div class="info-card">
+        <h4>
+            <i class="bi bi-calendar-check me-2"></i>
+            Historial de Citas
+        </h4>
+
+        <div th:if="${citas != null and !citas.isEmpty()}">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Motivo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="cita : ${citas}">
+                            <td>
+                                <i class="bi bi-calendar3 me-2 text-muted"></i>
+                                <span th:text="${#temporals.format(cita.horario.fecha, 'dd/MM/yyyy')}"></span>
+                            </td>
+                            <td>
+                                <i class="bi bi-clock me-2 text-muted"></i>
+                                <span th:text="${cita.horario.horaInicio} + ' - ' + ${cita.horario.horaFin}"></span>
+                            </td>
+                            <td th:text="${cita.motivoConsulta}"></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${cita.estado.name() == 'PROGRAMADA' ? 'badge-programada' : 
+                                                       cita.estado.name() == 'CONFIRMADA' ? 'badge-confirmada' : 
+                                                       cita.estado.name() == 'COMPLETADA' ? 'badge-completada' : 'badge-cancelada'}"
+                                      th:text="${cita.estado.displayName}">
+                                </span>
+                            </td>
+                            <td>
+                                <a th:href="@{/recepcionista/citas/__${cita.id}__}" 
+                                   class="btn btn-sm btn-info text-white">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div th:if="${citas == null or citas.isEmpty()}" class="empty-state">
+            <i class="bi bi-calendar-x"></i>
+            <h5>No hay citas registradas</h5>
+            <p>Este paciente aún no tiene citas programadas</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

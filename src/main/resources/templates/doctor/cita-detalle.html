@@ -71,7 +71,7 @@
                     <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Información de la Cita</h5>
                 </div>
                 <div class="card-body p-4">
-                    <!-- Estado -->
+
                     <div class="mb-3">
                         <span th:switch="${cita.estado.name()}">
                             <span th:case="'PROGRAMADA'" class="badge bg-warning text-dark fs-6">Programada</span>
@@ -81,7 +81,6 @@
                         </span>
                     </div>
                     
-                    <!-- Fecha y Hora -->
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="bg-light p-3 rounded">
@@ -96,20 +95,18 @@
                                 <p class="mb-1 mt-2 text-muted small">Horario</p>
                                 <h6 class="mb-0 fw-bold">
                                     <span th:text="${#temporals.format(cita.horario.horaInicio, 'HH:mm')}"></span>
-                                    - 
+                                    -
                                     <span th:text="${#temporals.format(cita.horario.horaFin, 'HH:mm')}"></span>
                                 </h6>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Motivo -->
                     <div class="mb-3" th:if="${cita.motivoConsulta}">
                         <h6 class="fw-bold"><i class="bi bi-file-text text-primary"></i> Motivo de Consulta:</h6>
                         <p class="mb-0" th:text="${cita.motivoConsulta}"></p>
                     </div>
                     
-                    <!-- Observaciones -->
                     <div th:if="${cita.observaciones}">
                         <h6 class="fw-bold"><i class="bi bi-chat-text text-primary"></i> Observaciones:</h6>
                         <p class="mb-0" th:text="${cita.observaciones}"></p>
@@ -123,6 +120,7 @@
                     <h5 class="mb-0"><i class="bi bi-file-medical-fill"></i> Diagnóstico Realizado</h5>
                 </div>
                 <div class="card-body p-4">
+
                     <div class="alert alert-info mb-3">
                         <h6 class="fw-bold">Diagnóstico:</h6>
                         <p class="mb-0" th:text="${diagnostico.diagnostico}"></p>
@@ -143,7 +141,6 @@
                         <p class="mb-0" th:text="${diagnostico.recomendaciones}"></p>
                     </div>
                     
-                    <!-- Signos Vitales -->
                     <div class="row mt-3" th:if="${diagnostico.presionArterial != null or diagnostico.temperatura != null}">
                         <div class="col-md-3" th:if="${diagnostico.presionArterial}">
                             <div class="text-center bg-light p-2 rounded">
@@ -181,6 +178,7 @@
                     <h6 class="mb-0 fw-bold"><i class="bi bi-person-fill text-primary"></i> Paciente</h6>
                 </div>
                 <div class="card-body">
+
                     <div class="text-center mb-3">
                         <div class="avatar-circle mx-auto mb-2">
                             <i class="bi bi-person-fill"></i>
@@ -234,11 +232,20 @@
                         <a th:href="@{/doctor/citas}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left"></i> Volver a Citas
                         </a>
-                        <a th:href="@{/doctor/citas/{id}/diagnostico(id=${cita.id})}" 
-                           class="btn btn-primary"
-                           th:if="${diagnostico == null and (cita.estado.name() == 'CONFIRMADA' or cita.estado.name() == 'PROGRAMADA')}">
-                            <i class="bi bi-file-medical"></i> Crear Diagnóstico
+
+                        <!-- SOLO funciona si la cita fue atendida (estado CONFIRMADA) -->
+                        <a th:if="${diagnostico == null and cita.estado.name() == 'CONFIRMADA'}"
+                           th:href="@{/doctor/citas/{id}/diagnostico(id=${cita.id})}"
+                           class="btn btn-primary">
+                            <i class="bi bi-file-medical"></i> Registrar Diagnóstico
                         </a>
+
+                        <!-- Si aún está programada, se informa -->
+                        <p th:if="${diagnostico == null and cita.estado.name() == 'PROGRAMADA'}"
+                           class="text-white text-center mt-2">
+                            <i class="bi bi-info-circle"></i> La cita aún no ha sido atendida.
+                        </p>
+
                     </div>
                 </div>
             </div>
