@@ -1,22 +1,28 @@
 package com.universidad.vitaltech.service.impl;
 
-import com.universidad.vitaltech.model.Rol;
-import com.universidad.vitaltech.model.Usuario;
-import com.universidad.vitaltech.repository.UsuarioRepository;
-import com.universidad.vitaltech.service.UsuarioService;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.universidad.vitaltech.model.Rol;
+import com.universidad.vitaltech.model.Usuario;
+import com.universidad.vitaltech.repository.UsuarioRepository;
+import com.universidad.vitaltech.service.UsuarioService;
 
 /**
  * Implementación del servicio de Usuario
  */
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
+
+    @Override
+    public List<Usuario> buscarPorTermino(String termino) {
+        return usuarioRepository.buscarPorNombreCorreoODocumento(termino);
+    }
     
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -150,7 +156,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
     
     @Override
-    public List<Usuario> buscarPorNombre(String nombre) {
-        return usuarioRepository.buscarPorNombre(nombre);
+    public List<Usuario> buscarPorNombre(String termino) {
+        return usuarioRepository.buscarPorNombreCorreoODocumento(termino);
     }
+
 }

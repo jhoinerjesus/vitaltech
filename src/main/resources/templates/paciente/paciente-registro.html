@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Paciente - VitalTech</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+      --primary-color: #667eea;
+      --primary-dark: #764ba2;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .form-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 100%;
+      max-width: 900px;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 3px solid #f0f0f0;
+      padding-bottom: 1rem;
+    }
+
+    .form-header h2 {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .section-title {
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--primary-color);
+      padding-left: 0.5rem;
+    }
+
+    .form-control, .form-select {
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 0.6rem;
+    }
+
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      padding: 0.8rem 2.5rem;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 1.5rem;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <div class="form-header">
+    <h2><i class="bi bi-person-plus-fill me-2"></i> Crear Cuenta de Paciente</h2>
+    <p>Regístrese para acceder a su historial y agendar citas</p>
+  </div>
+
+  <div th:if="${error}" class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <span th:text="${error}"></span>
+  </div>
+  <div th:if="${mensaje}" class="alert alert-success">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    <span th:text="${mensaje}"></span>
+  </div>
+
+  <form th:action="@{/registro/paciente}" th:object="${usuario}" method="post">
+
+    <!-- DATOS PERSONALES -->
+    <h5 class="section-title"><i class="bi bi-person-badge me-2"></i>Datos Personales</h5>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label required">Número de Documento</label>
+        <input type="date" id="fechaNacimiento" class="form-control" th:field="*{fechaNacimiento}" required>
+
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label required">Fecha de Nacimiento</label>
+        <input type="date" class="form-control" th:field="*{fechaNacimiento}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label required">Nombre</label>
+        <input type="text" class="form-control" th:field="*{nombre}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label required">Apellido</label>
+        <input type="text" class="form-control" th:field="*{apellido}" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Género</label>
+        <select class="form-select" th:field="*{genero}">
+          <option value="">Seleccione...</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- DATOS DE CONTACTO -->
+    <h5 class="section-title"><i class="bi bi-envelope me-2"></i>Datos de Contacto</h5>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label required">Correo Electrónico</label>
+        <input type="email" class="form-control" th:field="*{email}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label required">Teléfono</label>
+        <input type="tel" class="form-control" th:field="*{telefono}" required>
+      </div>
+    </div>
+
+    <!-- CREDENCIALES -->
+    <h5 class="section-title"><i class="bi bi-key me-2"></i>Credenciales de Acceso</h5>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label required">Usuario</label>
+        <input type="text" class="form-control" th:field="*{username}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label required">Contraseña</label>
+        <input type="password" class="form-control" th:field="*{password}" minlength="6" required>
+      </div>
+    </div>
+
+    <input type="hidden" th:field="*{rol}" value="PACIENTE">
+    <input type="hidden" th:field="*{activo}" value="true">
+
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-primary-custom">
+        <i class="bi bi-person-check me-2"></i>Registrarme
+      </button>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.querySelector('#fechaNacimiento')
+    .setAttribute('max', new Date().toISOString().split('T')[0]);
+</script>
+</body>
+</html>

@@ -104,13 +104,13 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
-                .successHandler(customSuccessHandler())  // <-- CAMBIO AQUÍ
+                .successHandler(customSuccessHandler()) 
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout=true")  // <-- Ya está bien
+                .logoutSuccessUrl("/login?logout=true")  
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()

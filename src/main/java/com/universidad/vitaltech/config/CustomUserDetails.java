@@ -1,12 +1,13 @@
 package com.universidad.vitaltech.config;
 
-import com.universidad.vitaltech.model.Usuario;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
+import com.universidad.vitaltech.model.Usuario;
 
 /**
  * Implementación personalizada de UserDetails para Spring Security
@@ -21,7 +22,7 @@ public class CustomUserDetails implements UserDetails {
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Retorna el rol del usuario con el prefijo ROLE_
+        // Retorna el rol del usuario con el prefijo role_
         return Collections.singletonList(
             new SimpleGrantedAuthority("ROLE_" + usuario.getRol().name())
         );

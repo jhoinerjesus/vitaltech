@@ -81,23 +81,23 @@ public class RecepcionistaController {
      * Buscar pacientes
      */
     @GetMapping("/pacientes")
-    public String buscarPacientes(@RequestParam(required = false) String termino, Model model) {
+        public String buscarPacientes(@RequestParam(required = false) String termino, Model model) {
         List<Usuario> pacientes;
-
+    
         if (termino != null && !termino.isEmpty()) {
-            pacientes = usuarioService.buscarPorNombre(termino);
+            pacientes = usuarioService.buscarPorTermino(termino);  // ← CAMBIAR AQUÍ
             // Filtrar solo pacientes
             pacientes = pacientes.stream()
-                    .filter(Usuario::esPaciente)
-                    .toList();
+                .filter(Usuario::esPaciente)
+                .toList();
             model.addAttribute("termino", termino);
-        } else {
+    }   else {
             pacientes = usuarioService.listarPacientesActivos();
         }
-
+    
         model.addAttribute("pacientes", pacientes);
-        return "recepcionista/pacientes";
-    }
+            return "recepcionista/pacientes";
+}       
 
     /**
      * Formulario para registrar paciente

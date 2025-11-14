@@ -1,19 +1,25 @@
 package com.universidad.vitaltech.controller;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.universidad.vitaltech.model.Rol;
 import com.universidad.vitaltech.model.Usuario;
 import com.universidad.vitaltech.service.CitaService;
 import com.universidad.vitaltech.service.DiagnosticoService;
 import com.universidad.vitaltech.service.UsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Controlador para funcionalidades del Administrador
@@ -108,7 +114,7 @@ public class AdminController {
     }
     
     /**
-     * Formulario para editar usuario
+     Formulario para editar usuario
      */
     @GetMapping("/usuarios/editar/{id}")
     public String editarUsuarioForm(@PathVariable String id, Model model, RedirectAttributes redirectAttributes) {
@@ -125,7 +131,7 @@ public class AdminController {
     }
     
     /**
-     * Actualizar usuario
+     Actualizar usuario
      */
     @PostMapping("/usuarios/actualizar")
     public String actualizarUsuario(@ModelAttribute Usuario usuario, RedirectAttributes redirectAttributes) {
@@ -141,7 +147,7 @@ public class AdminController {
     }
     
     /**
-     * Eliminar usuario
+     Eliminar usuario
      */
     @GetMapping("/usuarios/eliminar/{id}")
     public String eliminarUsuario(@PathVariable String id, RedirectAttributes redirectAttributes) {
@@ -157,7 +163,7 @@ public class AdminController {
     }
     
     /**
-     * Cambiar estado de usuario (activar/desactivar)
+     Cambiar estado de usuario (activar/desactivar)
      */
     @GetMapping("/usuarios/cambiar-estado/{id}")
     public String cambiarEstado(@PathVariable String id, RedirectAttributes redirectAttributes) {
@@ -223,12 +229,12 @@ public class AdminController {
         List<Usuario> usuarios;
         
         if (termino != null && !termino.isEmpty()) {
-            usuarios = usuarioService.buscarPorNombre(termino);
+            usuarios = usuarioService.buscarPorTermino(termino);  // ← CAMBIAR AQUÍ
             model.addAttribute("termino", termino);
-        } else {
+        }else {
             usuarios = usuarioService.listarTodos();
         }
-        
+    
         model.addAttribute("usuarios", usuarios);
         return "admin/usuarios";
     }

@@ -1,15 +1,17 @@
 package com.universidad.vitaltech.service;
 
-import com.universidad.vitaltech.model.Rol;
-import com.universidad.vitaltech.model.Usuario;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.universidad.vitaltech.model.Rol;
+import com.universidad.vitaltech.model.Usuario;
 
 /**
  * Interfaz del servicio de Usuario
  */
 public interface UsuarioService {
+    
+    List<Usuario> buscarPorTermino(String termino);
     
     // CRUD básico
     Usuario guardar(Usuario usuario);
@@ -40,4 +42,7 @@ public interface UsuarioService {
     
     // Búsqueda
     List<Usuario> buscarPorNombre(String nombre);
+
+
+
 }

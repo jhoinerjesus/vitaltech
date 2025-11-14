@@ -84,4 +84,17 @@ public class Cita {
         this.estado = EstadoCita.CONFIRMADA;
         this.fechaActualizacion = LocalDateTime.now();
     }
+
+    
+    public String getEstadoColor() {
+        return switch (estado) {
+            case PROGRAMADA -> "primary";
+            case CONFIRMADA -> "success";
+            case COMPLETADA -> "info";
+            case CANCELADA -> "danger";
+            case EN_CURSO -> "warning";
+            case NO_ASISTIO -> "secondary";
+            default -> "secondary";
+        };
+    }
 }

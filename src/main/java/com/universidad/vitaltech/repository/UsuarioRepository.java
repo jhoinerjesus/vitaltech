@@ -1,13 +1,14 @@
 package com.universidad.vitaltech.repository;
 
-import com.universidad.vitaltech.model.Rol;
-import com.universidad.vitaltech.model.Usuario;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.universidad.vitaltech.model.Rol;
+import com.universidad.vitaltech.model.Usuario;
 
 /**
  * Repositorio para la entidad Usuario
@@ -51,7 +52,16 @@ public interface UsuarioRepository extends MongoRepository<Usuario, String> {
     // Verificar si existe documento
     boolean existsByNumeroDocumento(String numeroDocumento);
     
-    // Buscar por nombre completo (búsqueda parcial)
+    // Buscar por nombre o apellido 
     @Query("{ $or: [ { 'nombre': { $regex: ?0, $options: 'i' } }, { 'apellido': { $regex: ?0, $options: 'i' } } ] }")
     List<Usuario> buscarPorNombre(String nombre);
+    
+    //Buscar por nombre apellido correo o numero de documento 
+    @Query("{ $or: [ " +
+            "{ 'nombre': { $regex: ?0, $options: 'i' } }, " +
+            "{ 'apellido': { $regex: ?0, $options: 'i' } }, " +
+            "{ 'email': { $regex: ?0, $options: 'i' } }, " +
+            "{ 'numeroDocumento': { $regex: ?0, $options: 'i' } } " +
+            "] }")
+    List<Usuario> buscarPorNombreCorreoODocumento(String termino);
 }

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Diagnósticos - VitalTech</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --card-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 5px 0 30px rgba(0,0,0,0.08);
+            padding: 2rem 0;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar-brand {
+            padding: 0 1.5rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin: 0.2rem 1rem;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        
+        .sidebar-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-link.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .sidebar-link i {
+            font-size: 1.2rem;
+            margin-right: 1rem;
+            width: 24px;
+        }
+        
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        .card-modern {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .card-modern:hover {
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+        }
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .diagnostico-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #4facfe;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .diagnostico-card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            transform: translateX(5px);
+        }
+        
+        .info-section {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.05), rgba(0, 242, 254, 0.05));
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .badge-custom {
+            background: var(--info-gradient);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #a0aec0;
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            opacity: 0.3;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        
+        .stat-icon.info {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.2));
+            color: #4facfe;
+        }
+        
+        .stat-icon.success {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.2), rgba(56, 239, 125, 0.2));
+            color: #11998e;
+        }
+        
+        .vital-sign {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+        
+        .vital-sign i {
+            font-size: 1.5rem;
+            color: #4facfe;
+            margin-bottom: 0.5rem;
+        }
+        
+        .list-custom {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .list-custom li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .list-custom li:last-child {
+            border-bottom: none;
+        }
+        
+        .list-custom li::before {
+            content: "•";
+            color: #4facfe;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+            margin-right: 0.5em;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand d-flex align-items-center">
+            <i class="bi bi-heart-pulse-fill me-2"></i>
+            VitalTech
+        </div>
+        
+        <a th:href="@{/paciente/dashboard}" class="sidebar-link">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+        </a>
+        <a th:href="@{/paciente/citas}" class="sidebar-link">
+            <i class="bi bi-calendar-event"></i>
+            <span>Mis Citas</span>
+        </a>
+        <a th:href="@{/paciente/citas/nueva}" class="sidebar-link">
+            <i class="bi bi-calendar-plus"></i>
+            <span>Agendar Cita</span>
+        </a>
+        <a th:href="@{/paciente/diagnosticos}" class="sidebar-link active">
+            <i class="bi bi-clipboard2-pulse"></i>
+            <span>Mis Diagnósticos</span>
+        </a>
+        
+        <hr class="mx-3 my-3">
+        
+        <form th:action="@{/logout}" method="post" class="px-3">
+            <button type="submit" class="sidebar-link w-100 text-start border-0 bg-transparent">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Cerrar Sesión</span>
+            </button>
+        </form>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header animate-fade-in">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h1 class="fw-bold mb-2" style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        <i class="bi bi-clipboard2-pulse me-2"></i>
+                        Mi Historial Médico
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Consulta todos tus diagnósticos médicos
+                    </p>
+                </div>
+                <div>
+                    <span class="badge-custom">
+                        <i class="bi bi-file-medical me-1"></i>
+                        <span th:text="${diagnosticos.size()}"></span> Diagnósticos
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lista de Diagnósticos -->
+        <div th:if="${diagnosticos != null and !diagnosticos.isEmpty()}">
+            <div th:each="diagnostico, iterStat : ${diagnosticos}" class="diagnostico-card animate-fade-in">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-2">
+                            <i class="bi bi-clipboard-pulse text-info me-2"></i>
+                            Diagnóstico #<span th:text="${diagnosticos.size() - iterStat.index}"></span>
+                        </h5>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-calendar3 me-2"></i>
+                            <span th:text="${#temporals.format(diagnostico.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></span>
+                        </p>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            th:data-bs-target="'#diagnostico' + ${iterStat.index}"
+                            style="border-radius: 8px;">
+                        <i class="bi bi-eye me-1"></i>
+                        Ver Detalle
+                    </button>
+                </div>
+                
+                <!-- Resumen -->
+                <div class="info-section">
+                    <h6 class="fw-bold mb-2">
+                        <i class="bi bi-file-text text-info me-2"></i>
+                        Diagnóstico:
+                    </h6>
+                    <p class="mb-0" th:text="${diagnostico.diagnostico}"></p>
+                </div>
+                
+                <!-- Detalles Colapsables -->
+                <div class="collapse" th:id="'diagnostico' + ${iterStat.index}">
+                    <hr class="my-3">
+                    
+                    <!-- Síntomas -->
+                    <div th:if="${diagnostico.sintomas != null and !diagnostico.sintomas.isEmpty()}" class="mb-3">
+                        <h6 class="fw-bold mb-2">
+                            <i class="bi bi-thermometer text-danger me-2"></i>
+                            Síntomas:
+                        </h6>
+                        <p class="text-muted mb-0" th:text="${diagnostico.sintomas}"></p>
+                    </div>
+                    
+                    <!-- Tratamiento -->
+                    <div th:if="${diagnostico.tratamiento != null and !diagnostico.tratamiento.isEmpty()}" class="mb-3">
+                        <h6 class="fw-bold mb-2">
+                            <i class="bi bi-heart-pulse text-success me-2"></i>
+                            Tratamiento:
+                        </h6>
+                        <p class="text-muted mb-0" th:text="${diagnostico.tratamiento}"></p>
+                    </div>
+                    
+                    <!-- Medicamentos -->
+                    <div th:if="${diagnostico.medicamentos != null and !diagnostico.medicamentos.isEmpty()}" class="mb-3">
+                        <h6 class="fw-bold mb-2">
+                            <i class="bi bi-capsule text-primary me-2"></i>
+                            Medicamentos:
+                        </h6>
+                        <ul class="list-custom mb-0">
+                            <li th:each="medicamento : ${diagnostico.medicamentos}" th:text="${medicamento}"></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Signos Vitales -->
+                    <div th:if="${diagnostico.presionArterial != null or diagnostico.temperatura != null or 
+                                  diagnostico.frecuenciaCardiaca != null or diagnostico.frecuenciaRespiratoria != null}">
+                        <h6 class="fw-bold mb-3">
+                            <i class="bi bi-activity text-danger me-2"></i>
+                            Signos Vitales:
+                        </h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6 col-md-3" th:if="${diagnostico.presionArterial != null}">
+                                <div class="vital-sign">
+                                    <i class="bi bi-heart"></i>
+                                    <p class="mb-1 small text-muted">Presión Arterial</p>
+                                    <p class="mb-0 fw-bold" th:text="${diagnostico.presionArterial}"></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3" th:if="${diagnostico.temperatura != null}">
+                                <div class="vital-sign">
+                                    <i class="bi bi-thermometer-half"></i>
+                                    <p class="mb-1 small text-muted">Temperatura</p>
+                                    <p class="mb-0 fw-bold" th:text="${diagnostico.temperatura} + '°C'"></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3" th:if="${diagnostico.frecuenciaCardiaca != null}">
+                                <div class="vital-sign">
+                                    <i class="bi bi-heart-pulse"></i>
+                                    <p class="mb-1 small text-muted">Frecuencia Cardíaca</p>
+                                    <p class="mb-0 fw-bold" th:text="${diagnostico.frecuenciaCardiaca} + ' bpm'"></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3" th:if="${diagnostico.frecuenciaRespiratoria != null}">
+                                <div class="vital-sign">
+                                    <i class="bi bi-wind"></i>
+                                    <p class="mb-1 small text-muted">Frecuencia Respiratoria</p>
+                                    <p class="mb-0 fw-bold" th:text="${diagnostico.frecuenciaRespiratoria} + ' rpm'"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Medidas Físicas -->
+                    <div th:if="${diagnostico.peso != null or diagnostico.altura != null}">
+                        <h6 class="fw-bold mb-3">
+                            <i class="bi bi-person text-info me-2"></i>
+                            Medidas Físicas:
+                        </h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6 col-md-3" th:if="${diagnostico.peso != null}">
+                                <div class="vital-sign">
+                                    <i class="bi bi-speedometer2"></i>
+                                    <p class="mb-1 small text-muted">Peso</p>
+                                    <p class="mb-0 fw-bold" th:text="${diagnostico.peso} + ' kg'"></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3" th:if="${diagnostico.altura != null}">
+                                <div class="vital-sign">
+                                    <i class="bi bi-arrows-vertical"></i>
+                                    <p class="mb-1 small text-muted">Altura</p>
+                                    <p class="mb-0 fw-bold" th:text="${diagnostico.altura} + ' m'"></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3" th:if="${diagnostico.calcularIMC() != null}">
+                                <div class="vital-sign">
+                                    <i class="bi bi-calculator"></i>
+                                    <p class="mb-1 small text-muted">IMC</p>
+                                    <p class="mb-0 fw-bold" th:text="${#numbers.formatDecimal(diagnostico.calcularIMC(), 1, 2)}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Exámenes Ordenados -->
+                    <div th:if="${diagnostico.examenesOrdenados != null and !diagnostico.examenesOrdenados.isEmpty()}" class="mb-3">
+                        <h6 class="fw-bold mb-2">
+                            <i class="bi bi-clipboard-data text-warning me-2"></i>
+                            Exámenes Ordenados:
+                        </h6>
+                        <ul class="list-custom mb-0">
+                            <li th:each="examen : ${diagnostico.examenesOrdenados}" th:text="${examen}"></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Recomendaciones -->
+                    <div th:if="${diagnostico.recomendaciones != null and !diagnostico.recomendaciones.isEmpty()}" class="mb-3">
+                        <h6 class="fw-bold mb-2">
+                            <i class="bi bi-lightbulb text-warning me-2"></i>
+                            Recomendaciones:
+                        </h6>
+                        <p class="text-muted mb-0" th:text="${diagnostico.recomendaciones}"></p>
+                    </div>
+                    
+                    <!-- Próxima Consulta -->
+                    <div th:if="${diagnostico.proximaConsulta != null and !diagnostico.proximaConsulta.isEmpty()}" class="mt-3">
+                        <div class="alert alert-info" style="border-radius: 10px; border: none; background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1)); border-left: 4px solid #4facfe;">
+                            <i class="bi bi-calendar-check me-2"></i>
+                            <strong>Próxima Consulta:</strong> <span th:text="${diagnostico.proximaConsulta}"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Observaciones -->
+                    <div th:if="${diagnostico.observaciones != null and !diagnostico.observaciones.isEmpty()}" class="mt-3">
+                        <h6 class="fw-bold mb-2">
+                            <i class="bi bi-journal-text text-secondary me-2"></i>
+                            Observaciones Adicionales:
+                        </h6>
+                        <p class="text-muted mb-0" th:text="${diagnostico.observaciones}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div th:if="${diagnosticos == null or diagnosticos.isEmpty()}" class="card-modern">
+            <div class="card-body">
+                <div class="empty-state">
+                    <i class="bi bi-clipboard-x"></i>
+                    <h4>No tienes diagnósticos registrados</h4>
+                    <p class="text-muted">Tus diagnósticos médicos aparecerán aquí después de tus consultas.</p>
+                    <a th:href="@{/paciente/citas/nueva}" class="btn btn-gradient mt-3" style="background: var(--primary-gradient); border: none; color: white; padding: 0.7rem 1.5rem; border-radius: 10px; font-weight: 600;">
+                        <i class="bi bi-calendar-plus me-2"></i>
+                        Agendar Primera Cita
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
