@@ -2,168 +2,604 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Doctor - Detalle de Cita</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitalTech - Detalle de Cita</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --info-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
         body {
-            background: linear-gradient(135deg, #667eea 0%, #4facfe 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .card {
+        
+        .main-container {
+            padding: 2rem 0;
+        }
+        
+        /* Header Card */
+        .header-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
             border: none;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
         }
+        
+        .header-card h3 {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        /* Cards mejoradas */
+        .modern-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .modern-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        }
+        
+        .card-header-gradient {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1.5rem 2rem;
+            border: none;
+        }
+        
+        .card-header-success {
+            background: var(--info-gradient);
+        }
+        
+        .card-header-gradient h5 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        /* Status badges modernos */
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .status-programada {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .status-confirmada {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .status-completada {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        
+        .status-cancelada {
+            background: linear-gradient(135deg, #868f96 0%, #596164 100%);
+            color: white;
+        }
+        
+        /* Info boxes */
+        .info-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .info-box:hover {
+            transform: translateY(-3px);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+        
+        .info-box i {
+            font-size: 2.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-box .label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-box .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        /* Avatar mejorado */
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+        }
+        
         .avatar-circle {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #4facfe 100%);
+            background: var(--primary-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 2rem;
+            font-size: 2.5rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            position: relative;
+        }
+        
+        .avatar-circle::after {
+            content: '';
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.5; }
+        }
+        
+        /* Patient info mejorado */
+        .patient-info-item {
+            padding: 1rem;
+            border-left: 4px solid transparent;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-bottom: 0.75rem;
+            background: #f8f9fa;
+        }
+        
+        .patient-info-item:hover {
+            border-left-color: #667eea;
+            background: #fff;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        .patient-info-item i {
+            font-size: 1.2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .patient-info-item .label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        .patient-info-item .value {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+        }
+        
+        /* Alert de alergias */
+        .allergy-alert {
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe0b3 100%);
+            border-left: 4px solid #ff9800;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .allergy-alert i {
+            color: #ff9800;
+        }
+        
+        /* Vital signs grid */
+        .vital-signs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .vital-sign-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 1.25rem;
+            text-align: center;
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .vital-sign-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .vital-sign-card .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+        
+        .vital-sign-card .label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .vital-sign-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+        
+        /* Buttons modernos */
+        .btn-modern {
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .btn-primary-gradient {
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .btn-outline-modern {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-outline-modern:hover {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+        
+        /* Section headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .section-header i {
+            font-size: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-header h6 {
+            margin: 0;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        /* Diagnosis content box */
+        .diagnosis-box {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            border-left: 4px solid #00bcd4;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .diagnosis-box h6 {
+            color: #00838f;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        
+        .diagnosis-box p {
+            color: #004d40;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        /* Content sections */
+        .content-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .content-section:hover {
+            border-left-color: #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        /* Alerts mejoradas */
+        .alert-modern {
+            border-radius: 15px;
+            border: none;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: slideInDown 0.5s ease;
+        }
+        
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-success-modern {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .alert-danger-modern {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem 0;
+            }
+            
+            .header-card {
+                padding: 1rem;
+            }
+            
+            .info-box {
+                margin-bottom: 1rem;
+            }
+            
+            .vital-signs-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container main-container">
     <!-- Header -->
-    <div class="card mb-4">
-        <div class="card-body d-flex justify-content-between align-items-center">
+    <div class="header-card">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
-                <h3 class="mb-0"><i class="bi bi-calendar-check text-primary"></i> Detalle de Cita</h3>
+                <h3><i class="bi bi-calendar-check-fill"></i> Detalle de Cita Médica</h3>
             </div>
-            <div>
-                <a th:href="@{/doctor/citas}" class="btn btn-outline-secondary me-2">
+            <div class="d-flex gap-2">
+                <a th:href="@{/doctor/citas}" class="btn btn-outline-modern btn-modern">
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
                 <form th:action="@{/logout}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-primary">Cerrar Sesión</button>
+                    <button type="submit" class="btn btn-primary-gradient btn-modern">
+                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                    </button>
                 </form>
             </div>
         </div>
     </div>
     
     <!-- Alerts -->
-    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show">
+    <div th:if="${mensaje}" class="alert alert-success-modern alert-modern alert-dismissible fade show">
         <i class="bi bi-check-circle-fill me-2"></i>
-        <span th:text="${mensaje}"></span>
+        <strong>¡Éxito!</strong> <span th:text="${mensaje}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+    <div th:if="${error}" class="alert alert-danger-modern alert-modern alert-dismissible fade show">
         <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        <span th:text="${error}"></span>
+        <strong>Error:</strong> <span th:text="${error}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     
     <div class="row">
-        <!-- Información de la Cita -->
-        <div class="col-lg-8 mb-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Información de la Cita</h5>
+        <!-- Columna Principal: Información de la Cita -->
+        <div class="col-lg-8">
+            <!-- Estado y Detalles de la Cita -->
+            <div class="modern-card">
+                <div class="card-header-gradient">
+                    <h5><i class="bi bi-clipboard2-pulse-fill"></i> Información de la Cita</h5>
                 </div>
                 <div class="card-body p-4">
-
-                    <div class="mb-3">
+                    <!-- Estado Badge -->
+                    <div class="mb-4 text-center">
                         <span th:switch="${cita.estado.name()}">
-                            <span th:case="'PROGRAMADA'" class="badge bg-warning text-dark fs-6">Programada</span>
-                            <span th:case="'CONFIRMADA'" class="badge bg-info fs-6">Confirmada</span>
-                            <span th:case="'COMPLETADA'" class="badge bg-success fs-6">Completada</span>
-                            <span th:case="*" class="badge bg-secondary fs-6">Cancelada</span>
+                            <span th:case="'PROGRAMADA'" class="status-badge status-programada">
+                                <i class="bi bi-clock-fill"></i> Programada
+                            </span>
+                            <span th:case="'CONFIRMADA'" class="status-badge status-confirmada">
+                                <i class="bi bi-check-circle-fill"></i> Confirmada
+                            </span>
+                            <span th:case="'COMPLETADA'" class="status-badge status-completada">
+                                <i class="bi bi-check-all"></i> Completada
+                            </span>
+                            <span th:case="*" class="status-badge status-cancelada">
+                                <i class="bi bi-x-circle-fill"></i> Cancelada
+                            </span>
                         </span>
                     </div>
                     
-                    <div class="row mb-3">
+                    <!-- Fecha y Horario -->
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <div class="bg-light p-3 rounded">
-                                <i class="bi bi-calendar3 fs-3 text-primary"></i>
-                                <p class="mb-1 mt-2 text-muted small">Fecha</p>
-                                <h6 class="mb-0 fw-bold" th:text="${#temporals.format(cita.horario.fecha, 'dd/MM/yyyy')}"></h6>
+                            <div class="info-box">
+                                <i class="bi bi-calendar3"></i>
+                                <div class="label">Fecha de la Cita</div>
+                                <div class="value" th:text="${#temporals.format(cita.horario.fecha, 'dd/MM/yyyy')}"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="bg-light p-3 rounded">
-                                <i class="bi bi-clock fs-3 text-primary"></i>
-                                <p class="mb-1 mt-2 text-muted small">Horario</p>
-                                <h6 class="mb-0 fw-bold">
+                            <div class="info-box">
+                                <i class="bi bi-clock"></i>
+                                <div class="label">Horario</div>
+                                <div class="value">
                                     <span th:text="${#temporals.format(cita.horario.horaInicio, 'HH:mm')}"></span>
-                                    -
+                                    <span> - </span>
                                     <span th:text="${#temporals.format(cita.horario.horaFin, 'HH:mm')}"></span>
-                                </h6>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="mb-3" th:if="${cita.motivoConsulta}">
-                        <h6 class="fw-bold"><i class="bi bi-file-text text-primary"></i> Motivo de Consulta:</h6>
+                    <!-- Motivo de Consulta -->
+                    <div class="content-section" th:if="${cita.motivoConsulta}">
+                        <div class="section-header">
+                            <i class="bi bi-file-text-fill"></i>
+                            <h6>Motivo de Consulta</h6>
+                        </div>
                         <p class="mb-0" th:text="${cita.motivoConsulta}"></p>
                     </div>
                     
-                    <div th:if="${cita.observaciones}">
-                        <h6 class="fw-bold"><i class="bi bi-chat-text text-primary"></i> Observaciones:</h6>
+                    <!-- Observaciones -->
+                    <div class="content-section" th:if="${cita.observaciones}">
+                        <div class="section-header">
+                            <i class="bi bi-chat-left-text-fill"></i>
+                            <h6>Observaciones</h6>
+                        </div>
                         <p class="mb-0" th:text="${cita.observaciones}"></p>
                     </div>
                 </div>
             </div>
             
             <!-- Diagnóstico (si existe) -->
-            <div class="card" th:if="${diagnostico != null}">
-                <div class="card-header bg-success text-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-file-medical-fill"></i> Diagnóstico Realizado</h5>
+            <div class="modern-card" th:if="${diagnostico != null}">
+                <div class="card-header-gradient card-header-success">
+                    <h5><i class="bi bi-file-medical-fill"></i> Diagnóstico Médico</h5>
                 </div>
                 <div class="card-body p-4">
-
-                    <div class="alert alert-info mb-3">
-                        <h6 class="fw-bold">Diagnóstico:</h6>
-                        <p class="mb-0" th:text="${diagnostico.diagnostico}"></p>
+                    <!-- Diagnóstico Principal -->
+                    <div class="diagnosis-box">
+                        <h6><i class="bi bi-stethoscope"></i> Diagnóstico</h6>
+                        <p th:text="${diagnostico.diagnostico}"></p>
                     </div>
                     
-                    <div class="mb-3" th:if="${diagnostico.sintomas}">
-                        <h6 class="fw-bold">Síntomas:</h6>
+                    <!-- Síntomas -->
+                    <div class="content-section" th:if="${diagnostico.sintomas}">
+                        <div class="section-header">
+                            <i class="bi bi-thermometer-half"></i>
+                            <h6>Síntomas Reportados</h6>
+                        </div>
                         <p class="mb-0" th:text="${diagnostico.sintomas}"></p>
                     </div>
                     
-                    <div class="mb-3" th:if="${diagnostico.tratamiento}">
-                        <h6 class="fw-bold">Tratamiento:</h6>
+                    <!-- Tratamiento -->
+                    <div class="content-section" th:if="${diagnostico.tratamiento}">
+                        <div class="section-header">
+                            <i class="bi bi-capsule"></i>
+                            <h6>Tratamiento Prescrito</h6>
+                        </div>
                         <p class="mb-0" th:text="${diagnostico.tratamiento}"></p>
                     </div>
                     
-                    <div th:if="${diagnostico.recomendaciones}">
-                        <h6 class="fw-bold">Recomendaciones:</h6>
+                    <!-- Recomendaciones -->
+                    <div class="content-section" th:if="${diagnostico.recomendaciones}">
+                        <div class="section-header">
+                            <i class="bi bi-lightbulb-fill"></i>
+                            <h6>Recomendaciones</h6>
+                        </div>
                         <p class="mb-0" th:text="${diagnostico.recomendaciones}"></p>
                     </div>
                     
-                    <div class="row mt-3" th:if="${diagnostico.presionArterial != null or diagnostico.temperatura != null}">
-                        <div class="col-md-3" th:if="${diagnostico.presionArterial}">
-                            <div class="text-center bg-light p-2 rounded">
-                                <small class="text-muted">Presión</small>
-                                <p class="mb-0 fw-bold" th:text="${diagnostico.presionArterial}"></p>
-                            </div>
+                    <!-- Signos Vitales -->
+                    <div th:if="${diagnostico.presionArterial != null or diagnostico.temperatura != null}">
+                        <div class="section-header mt-4">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                            <h6>Signos Vitales</h6>
                         </div>
-                        <div class="col-md-3" th:if="${diagnostico.temperatura}">
-                            <div class="text-center bg-light p-2 rounded">
-                                <small class="text-muted">Temperatura</small>
-                                <p class="mb-0 fw-bold" th:text="${diagnostico.temperatura} + '°C'"></p>
+                        
+                        <div class="vital-signs-grid">
+                            <div class="vital-sign-card" th:if="${diagnostico.presionArterial}">
+                                <div class="icon"><i class="bi bi-activity"></i></div>
+                                <div class="label">Presión Arterial</div>
+                                <div class="value" th:text="${diagnostico.presionArterial}"></div>
                             </div>
-                        </div>
-                        <div class="col-md-3" th:if="${diagnostico.frecuenciaCardiaca}">
-                            <div class="text-center bg-light p-2 rounded">
-                                <small class="text-muted">FC</small>
-                                <p class="mb-0 fw-bold" th:text="${diagnostico.frecuenciaCardiaca} + ' lpm'"></p>
+                            
+                            <div class="vital-sign-card" th:if="${diagnostico.temperatura}">
+                                <div class="icon"><i class="bi bi-thermometer"></i></div>
+                                <div class="label">Temperatura</div>
+                                <div class="value" th:text="${diagnostico.temperatura} + '°C'"></div>
                             </div>
-                        </div>
-                        <div class="col-md-3" th:if="${diagnostico.peso}">
-                            <div class="text-center bg-light p-2 rounded">
-                                <small class="text-muted">Peso</small>
-                                <p class="mb-0 fw-bold" th:text="${diagnostico.peso} + ' kg'"></p>
+                            
+                            <div class="vital-sign-card" th:if="${diagnostico.frecuenciaCardiaca}">
+                                <div class="icon"><i class="bi bi-heart-pulse"></i></div>
+                                <div class="label">Frecuencia Card.</div>
+                                <div class="value" th:text="${diagnostico.frecuenciaCardiaca} + ' lpm'"></div>
+                            </div>
+                            
+                            <div class="vital-sign-card" th:if="${diagnostico.peso}">
+                                <div class="icon"><i class="bi bi-rulers"></i></div>
+                                <div class="label">Peso</div>
+                                <div class="value" th:text="${diagnostico.peso} + ' kg'"></div>
                             </div>
                         </div>
                     </div>
@@ -171,81 +607,111 @@
             </div>
         </div>
         
-        <!-- Información del Paciente -->
+        <!-- Columna Lateral: Información del Paciente -->
         <div class="col-lg-4">
-            <div class="card" th:if="${paciente != null}">
-                <div class="card-header bg-white py-3">
-                    <h6 class="mb-0 fw-bold"><i class="bi bi-person-fill text-primary"></i> Paciente</h6>
+            <!-- Card del Paciente -->
+            <div class="modern-card" th:if="${paciente != null}">
+                <div class="card-header-gradient">
+                    <h5><i class="bi bi-person-fill"></i> Información del Paciente</h5>
                 </div>
-                <div class="card-body">
-
-                    <div class="text-center mb-3">
-                        <div class="avatar-circle mx-auto mb-2">
-                            <i class="bi bi-person-fill"></i>
+                <div class="card-body p-4">
+                    <!-- Avatar y Nombre -->
+                    <div class="text-center mb-4">
+                        <div class="avatar-container">
+                            <div class="avatar-circle">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
                         </div>
-                        <h5 class="fw-bold mb-0" th:text="${paciente.nombreCompleto}"></h5>
+                        <h5 class="fw-bold mt-3 mb-1" th:text="${paciente.nombreCompleto}"></h5>
+                        <span class="badge bg-primary">Paciente</span>
                     </div>
                     
-                    <hr>
-                    
-                    <div class="mb-2">
-                        <small class="text-muted"><i class="bi bi-credit-card-2-front"></i> Documento</small>
-                        <p class="mb-0 fw-bold" th:text="${paciente.numeroDocumento}"></p>
+                    <!-- Información del Paciente -->
+                    <div class="patient-info-item">
+                        <i class="bi bi-credit-card-2-front-fill"></i>
+                        <span class="label">Documento</span>
+                        <div class="value" th:text="${paciente.numeroDocumento}"></div>
                     </div>
                     
-                    <div class="mb-2">
-                        <small class="text-muted"><i class="bi bi-envelope"></i> Email</small>
-                        <p class="mb-0" th:text="${paciente.email}"></p>
+                    <div class="patient-info-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span class="label">Email</span>
+                        <div class="value" th:text="${paciente.email}"></div>
                     </div>
                     
-                    <div class="mb-2">
-                        <small class="text-muted"><i class="bi bi-telephone"></i> Teléfono</small>
-                        <p class="mb-0" th:text="${paciente.telefono}"></p>
+                    <div class="patient-info-item">
+                        <i class="bi bi-telephone-fill"></i>
+                        <span class="label">Teléfono</span>
+                        <div class="value" th:text="${paciente.telefono}"></div>
                     </div>
                     
-                    <div class="mb-2">
-                        <small class="text-muted"><i class="bi bi-calendar-event"></i> Edad</small>
-                        <p class="mb-0" th:text="${paciente.edad} + ' años'"></p>
+                    <div class="patient-info-item">
+                        <i class="bi bi-calendar-event-fill"></i>
+                        <span class="label">Edad</span>
+                        <div class="value" th:text="${paciente.edad} + ' años'"></div>
                     </div>
                     
-                    <div class="mb-2" th:if="${paciente.informacionMedica != null and paciente.informacionMedica.tipoSangre != null}">
-                        <small class="text-muted"><i class="bi bi-droplet-fill text-danger"></i> Tipo de Sangre</small>
-                        <p class="mb-0 fw-bold" th:text="${paciente.informacionMedica.tipoSangre}"></p>
+                    <div class="patient-info-item" th:if="${paciente.informacionMedica != null and paciente.informacionMedica.tipoSangre != null}">
+                        <i class="bi bi-droplet-fill text-danger"></i>
+                        <span class="label">Tipo de Sangre</span>
+                        <div class="value fw-bold text-danger" th:text="${paciente.informacionMedica.tipoSangre}"></div>
                     </div>
                     
+                    <!-- Alergias -->
                     <div th:if="${paciente.informacionMedica != null and paciente.informacionMedica.alergias != null and !paciente.informacionMedica.alergias.empty}">
-                        <small class="text-muted"><i class="bi bi-exclamation-triangle text-warning"></i> Alergias</small>
-                        <div class="alert alert-warning py-1 px-2 mt-1">
-                            <small th:each="alergia, iterStat : ${paciente.informacionMedica.alergias}">
-                                <span th:text="${alergia}"></span>
-                                <span th:if="${!iterStat.last}">, </span>
-                            </small>
+                        <div class="allergy-alert">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                                <strong>Alergias Reportadas</strong>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span th:each="alergia : ${paciente.informacionMedica.alergias}" 
+                                      class="badge bg-warning text-dark" 
+                                      th:text="${alergia}"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Acciones -->
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a th:href="@{/doctor/citas}" class="btn btn-outline-secondary">
+            <!-- Card de Acciones -->
+            <div class="modern-card">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="bi bi-gear-fill"></i> Acciones Disponibles
+                    </h6>
+                    
+                    <div class="d-grid gap-3">
+                        <a th:href="@{/doctor/citas}" class="btn btn-outline-modern btn-modern">
                             <i class="bi bi-arrow-left"></i> Volver a Citas
                         </a>
-
-                        <!-- SOLO funciona si la cita fue atendida (estado CONFIRMADA) -->
+                        
+                        <!-- Botón para registrar diagnóstico -->
                         <a th:if="${diagnostico == null and cita.estado.name() == 'CONFIRMADA'}"
                            th:href="@{/doctor/citas/{id}/diagnostico(id=${cita.id})}"
-                           class="btn btn-primary">
-                            <i class="bi bi-file-medical"></i> Registrar Diagnóstico
+                           class="btn btn-primary-gradient btn-modern">
+                            <i class="bi bi-file-medical-fill"></i> Registrar Diagnóstico
                         </a>
-
-                        <!-- Si aún está programada, se informa -->
-                        <p th:if="${diagnostico == null and cita.estado.name() == 'PROGRAMADA'}"
-                           class="text-white text-center mt-2">
-                            <i class="bi bi-info-circle"></i> La cita aún no ha sido atendida.
-                        </p>
-
+                        
+                        <!-- Mensaje si está programada -->
+                        <div th:if="${diagnostico == null and cita.estado.name() == 'PROGRAMADA'}"
+                             class="alert alert-info mb-0 text-center" style="border-radius: 15px;">
+                            <i class="bi bi-info-circle-fill"></i>
+                            <small class="d-block mt-2">
+                                <strong>Cita Pendiente</strong><br>
+                                La cita debe ser confirmada antes de registrar el diagnóstico.
+                            </small>
+                        </div>
+                        
+                        <!-- Mensaje si ya tiene diagnóstico -->
+                        <div th:if="${diagnostico != null}"
+                             class="alert alert-success mb-0 text-center" style="border-radius: 15px;">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <small class="d-block mt-2">
+                                <strong>Diagnóstico Completado</strong><br>
+                                Esta cita ya cuenta con un diagnóstico registrado.
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>

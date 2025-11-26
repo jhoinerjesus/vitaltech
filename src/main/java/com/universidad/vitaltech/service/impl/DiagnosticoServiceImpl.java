@@ -1,14 +1,15 @@
 package com.universidad.vitaltech.service.impl;
 
-import com.universidad.vitaltech.model.Diagnostico;
-import com.universidad.vitaltech.repository.DiagnosticoRepository;
-import com.universidad.vitaltech.service.DiagnosticoService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.universidad.vitaltech.model.Diagnostico;
+import com.universidad.vitaltech.repository.DiagnosticoRepository;
+import com.universidad.vitaltech.service.DiagnosticoService;
 
 /**
  * Implementación del servicio de Diagnostico

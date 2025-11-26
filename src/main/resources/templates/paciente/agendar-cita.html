@@ -88,15 +88,6 @@
             transition: all 0.3s ease;
         }
         
-        .card-header-gradient {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 1.5rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 16px 16px 0 0;
-        }
-        
         .page-header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -173,7 +164,7 @@
             font-weight: 600;
         }
         
-        .time-slot:hover {
+        .time-slot:hover:not(.disabled) {
             border-color: #667eea;
             background: rgba(102, 126, 234, 0.1);
         }
@@ -183,6 +174,12 @@
             color: white;
             border-color: #667eea;
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .time-slot.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f5f5f5;
         }
         
         .step-indicator {
@@ -244,6 +241,20 @@
         .form-section.active {
             display: block;
             animation: fadeInUp 0.5s ease;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
         @keyframes fadeInUp {
@@ -400,7 +411,7 @@
                         </h4>
                         
                         <div class="row g-4">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label for="fecha" class="form-label">
                                     <i class="bi bi-calendar3 me-2"></i>
                                     Fecha de la Cita
@@ -410,55 +421,23 @@
                                        id="fecha" 
                                        name="fecha" 
                                        required
+                                       onchange="cargarHorariosDisponibles()"
                                        th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Selecciona una fecha para ver los horarios disponibles del doctor
+                                </small>
                             </div>
                             
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label">
                                     <i class="bi bi-clock me-2"></i>
-                                    Hora Disponible (30 min)
+                                    Horarios Disponibles (30 minutos)
                                 </label>
-                                <div class="row g-2" id="horariosDisponibles">
-                                    <!-- Horarios comunes de 8:00 AM a 5:00 PM -->
-                                    <div class="col-4">
-                                        <div class="time-slot" data-hora-inicio="08:00" data-hora-fin="08:30" onclick="selectTime(this)">
-                                            08:00 AM
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="time-slot" data-hora-inicio="09:00" data-hora-fin="09:30" onclick="selectTime(this)">
-                                            09:00 AM
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="time-slot" data-hora-inicio="10:00" data-hora-fin="10:30" onclick="selectTime(this)">
-                                            10:00 AM
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="time-slot" data-hora-inicio="11:00" data-hora-fin="11:30" onclick="selectTime(this)">
-                                            11:00 AM
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="time-slot" data-hora-inicio="14:00" data-hora-fin="14:30" onclick="selectTime(this)">
-                                            02:00 PM
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="time-slot" data-hora-inicio="15:00" data-hora-fin="15:30" onclick="selectTime(this)">
-                                            03:00 PM
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="time-slot" data-hora-inicio="16:00" data-hora-fin="16:30" onclick="selectTime(this)">
-                                            04:00 PM
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="time-slot" data-hora-inicio="17:00" data-hora-fin="17:30" onclick="selectTime(this)">
-                                            05:00 PM
-                                        </div>
+                                <div id="horariosContainer">
+                                    <div class="text-center py-4 text-muted">
+                                        <i class="bi bi-calendar-check" style="font-size: 3rem; opacity: 0.3;"></i>
+                                        <p class="mt-3 mb-0">Selecciona un doctor y una fecha para ver los horarios disponibles</p>
                                     </div>
                                 </div>
                                 <input type="hidden" name="horaInicio" id="horaInicio" required>
@@ -545,10 +524,7 @@
         let selectedTime = null;
         
         function selectDoctor(element) {
-            // Remover selección anterior
             document.querySelectorAll('.doctor-card').forEach(card => card.classList.remove('selected'));
-            
-            // Seleccionar nuevo
             element.classList.add('selected');
             selectedDoctor = {
                 id: element.dataset.doctorId,
@@ -559,13 +535,105 @@
             document.getElementById('doctorId').value = selectedDoctor.id;
             document.getElementById('resumenDoctor').textContent = 'Dr(a). ' + selectedDoctor.nombre;
             document.getElementById('resumenEspecialidad').textContent = selectedDoctor.especialidad;
+            
+            // Limpiar horarios al cambiar de doctor
+            document.getElementById('horariosContainer').innerHTML = `
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-calendar-check" style="font-size: 3rem; opacity: 0.3;"></i>
+                    <p class="mt-3 mb-0">Selecciona una fecha para ver los horarios disponibles</p>
+                </div>
+            `;
+            document.getElementById('fecha').value = '';
+            selectedTime = null;
+        }
+        
+        async function cargarHorariosDisponibles() {
+            const doctorId = document.getElementById('doctorId').value;
+            const fecha = document.getElementById('fecha').value;
+            
+            if (!doctorId || !fecha) {
+                return;
+            }
+            
+            const container = document.getElementById('horariosContainer');
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <div class="loading-spinner mx-auto"></div>
+                    <p class="mt-3 text-muted">Cargando horarios disponibles...</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(`/paciente/api/horarios-disponibles?doctorId=${doctorId}&fecha=${fecha}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    container.innerHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            ${data.error}
+                        </div>
+                    `;
+                    return;
+                }
+                
+                if (data.mensaje || data.horarios.length === 0) {
+                    container.innerHTML = `
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-info-circle me-2"></i>
+                            ${data.mensaje || 'No hay horarios disponibles para esta fecha'}
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Renderizar horarios disponibles
+                let horariosHTML = '<div class="row g-2">';
+                data.horarios.forEach(hora => {
+                    const horaFin = agregarMinutos(hora, 30);
+                    const horaDisplay = formatearHora(hora);
+                    horariosHTML += `
+                        <div class="col-4 col-md-3">
+                            <div class="time-slot" 
+                                 data-hora-inicio="${hora}" 
+                                 data-hora-fin="${horaFin}" 
+                                 onclick="selectTime(this)">
+                                ${horaDisplay}
+                            </div>
+                        </div>
+                    `;
+                });
+                horariosHTML += '</div>';
+                container.innerHTML = horariosHTML;
+                
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Error al cargar horarios. Por favor, intenta nuevamente.
+                    </div>
+                `;
+                console.error('Error:', error);
+            }
+        }
+        
+        function agregarMinutos(hora, minutos) {
+            const [h, m] = hora.split(':').map(Number);
+            const totalMinutos = h * 60 + m + minutos;
+            const nuevaHora = Math.floor(totalMinutos / 60);
+            const nuevosMinutos = totalMinutos % 60;
+            return `${String(nuevaHora).padStart(2, '0')}:${String(nuevosMinutos).padStart(2, '0')}`;
+        }
+        
+        function formatearHora(hora) {
+            const [h, m] = hora.split(':').map(Number);
+            const periodo = h >= 12 ? 'PM' : 'AM';
+            const hora12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+            return `${hora12}:${String(m).padStart(2, '0')} ${periodo}`;
         }
         
         function selectTime(element) {
-            // Remover selección anterior
             document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
-            
-            // Seleccionar nuevo
             element.classList.add('selected');
             selectedTime = {
                 inicio: element.dataset.horaInicio,
@@ -579,10 +647,9 @@
         }
         
         function nextStep(currentStep) {
-            // Validar paso actual
             if (currentStep === 1) {
                 if (!selectedDoctor) {
-                    alert('Por favor selecciona un doctor');
+                    alert('⚠️ Por favor selecciona un doctor');
                     return;
                 }
             }
@@ -590,54 +657,46 @@
             if (currentStep === 2) {
                 const fecha = document.getElementById('fecha').value;
                 if (!fecha) {
-                    alert('Por favor selecciona una fecha');
+                    alert('⚠️ Por favor selecciona una fecha');
                     return;
                 }
                 if (!selectedTime) {
-                    alert('Por favor selecciona un horario');
+                    alert('⚠️ Por favor selecciona un horario');
                     return;
                 }
                 
-                // Actualizar resumen de fecha
                 const fechaObj = new Date(fecha + 'T00:00:00');
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
                 document.getElementById('resumenFecha').textContent = fechaObj.toLocaleDateString('es-ES', options);
             }
             
-            // Ocultar paso actual
             document.getElementById('section' + currentStep).classList.remove('active');
             document.getElementById('step' + currentStep).classList.remove('active');
             document.getElementById('step' + currentStep).classList.add('completed');
             
-            // Mostrar siguiente paso
             const nextStepNum = currentStep + 1;
             document.getElementById('section' + nextStepNum).classList.add('active');
             document.getElementById('step' + nextStepNum).classList.add('active');
             
-            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
         function prevStep(currentStep) {
-            // Ocultar paso actual
             document.getElementById('section' + currentStep).classList.remove('active');
             document.getElementById('step' + currentStep).classList.remove('active');
             
-            // Mostrar paso anterior
             const prevStepNum = currentStep - 1;
             document.getElementById('section' + prevStepNum).classList.add('active');
             document.getElementById('step' + prevStepNum).classList.add('active');
             document.getElementById('step' + prevStepNum).classList.remove('completed');
             
-            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
-        // Validar formulario antes de enviar
         document.getElementById('citaForm').addEventListener('submit', function(e) {
             if (!selectedDoctor || !selectedTime || !document.getElementById('fecha').value) {
                 e.preventDefault();
-                alert('Por favor completa todos los campos requeridos');
+                alert('⚠️ Por favor completa todos los campos requeridos');
             }
         });
     </script>

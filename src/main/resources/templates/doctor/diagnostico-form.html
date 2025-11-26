@@ -1,261 +1,397 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{doctor/layout-doctor :: head('Doctor - Crear Diagnóstico')}"></head>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Diagnóstico - Doctor</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #4facfe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container-custom {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            background: white;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            border-radius: 20px 20px 0 0 !important;
+            border: none;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .btn-doctor {
+            background: linear-gradient(135deg, #2a5298 0%, #4facfe 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(42, 82, 152, 0.3);
+        }
+
+        .btn-doctor:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(42, 82, 152, 0.4);
+        }
+
+        .btn-outline-secondary {
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e6ed;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #4facfe !important;
+            box-shadow: 0 0 0 0.25rem rgba(79, 172, 254, 0.15) !important;
+            transform: translateY(-1px);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            margin: 2rem 0 1.5rem 0;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .section-diag {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+            color: #dc2626;
+        }
+
+        .section-diag::before {
+            background: #dc2626;
+        }
+
+        .section-sint {
+            background: linear-gradient(135deg, rgba(234, 88, 12, 0.1) 0%, rgba(249, 115, 22, 0.05) 100%);
+            color: #ea580c;
+        }
+
+        .section-sint::before {
+            background: #ea580c;
+        }
+
+        .section-trat {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+            color: #10b981;
+        }
+
+        .section-trat::before {
+            background: #10b981;
+        }
+
+        .section-reco {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(129, 140, 248, 0.05) 100%);
+            color: #6366f1;
+        }
+
+        .section-reco::before {
+            background: #6366f1;
+        }
+
+        .section-vital {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(244, 114, 182, 0.05) 100%);
+            color: #ec4899;
+        }
+
+        .section-vital::before {
+            background: #ec4899;
+        }
+
+        .vital-input-group {
+            background: #f8fafc;
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .vital-input-group:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .vital-input-group .form-control {
+            background: white;
+            margin-top: 8px;
+        }
+
+        .vital-input-group small {
+            display: block;
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-text {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .mb-4 {
+            position: relative;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1;
+        }
+    </style>
+</head>
+
 <body>
-
-<!-- Sidebar -->
-<div th:replace="~{doctor/layout-doctor :: sidebar}"></div>
-
-<!-- Main Content -->
-<div class="main-content">
-    
-    <!-- Top Bar -->
-    <div th:replace="~{doctor/layout-doctor :: topbar}" th:with="pageTitle='Crear Diagnóstico'"></div>
-    
-    <div class="row animate-fade-in">
-        <!-- Formulario -->
-        <div class="col-lg-8 mb-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="mb-0">
-                        <i class="bi bi-file-medical-fill"></i> Registro de Diagnóstico
-                    </h5>
-                </div>
-                <div class="card-body p-4">
-                    
-                    <form th:action="@{/doctor/diagnostico/guardar}" th:object="${diagnostico}" method="post">
-                        
-                        <!-- Hidden fields -->
-                        <input type="hidden" th:field="*{citaId}">
-                        <input type="hidden" th:field="*{pacienteId}">
-                        <input type="hidden" th:field="*{doctorId}">
-                        
-                        <!-- Diagnóstico Principal -->
-                        <h6 class="fw-bold text-primary mb-3">
-                            <i class="bi bi-clipboard2-pulse"></i> Diagnóstico
-                        </h6>
-                        
-                        <div class="mb-4">
-                            <label for="diagnostico" class="form-label">Diagnóstico Principal *</label>
-                            <textarea class="form-control" id="diagnostico" th:field="*{diagnostico}" 
-                                      rows="3" required placeholder="Describa el diagnóstico principal..."></textarea>
-                        </div>
-                        
-                        <!-- Síntomas -->
-                        <div class="mb-4">
-                            <label for="sintomas" class="form-label">Síntomas Presentados</label>
-                            <textarea class="form-control" id="sintomas" th:field="*{sintomas}" 
-                                      rows="3" placeholder="Describa los síntomas que presenta el paciente..."></textarea>
-                        </div>
-                        
-                        <hr class="my-4">
-                        
-                        <!-- Signos Vitales -->
-                        <h6 class="fw-bold text-primary mb-3">
-                            <i class="bi bi-heart-pulse"></i> Signos Vitales
-                        </h6>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="presionArterial" class="form-label">Presión Arterial</label>
-                                <input type="text" class="form-control" id="presionArterial" 
-                                       th:field="*{presionArterial}" placeholder="Ej: 120/80">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="temperatura" class="form-label">Temperatura (°C)</label>
-                                <input type="number" step="0.1" class="form-control" id="temperatura" 
-                                       th:field="*{temperatura}" placeholder="Ej: 36.5">
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <label for="frecuenciaCardiaca" class="form-label">Frecuencia Cardíaca (lpm)</label>
-                                <input type="number" class="form-control" id="frecuenciaCardiaca" 
-                                       th:field="*{frecuenciaCardiaca}" placeholder="Ej: 72">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="peso" class="form-label">Peso (kg)</label>
-                                <input type="number" step="0.1" class="form-control" id="peso" 
-                                       th:field="*{peso}" placeholder="Ej: 70.5">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="altura" class="form-label">Altura (m)</label>
-                                <input type="number" step="0.01" class="form-control" id="altura" 
-                                       th:field="*{altura}" placeholder="Ej: 1.75">
-                            </div>
-                        </div>
-                        
-                        <hr class="my-4">
-                        
-                        <!-- Tratamiento -->
-                        <h6 class="fw-bold text-primary mb-3">
-                            <i class="bi bi-capsule"></i> Tratamiento y Recomendaciones
-                        </h6>
-                        
-                        <div class="mb-4">
-                            <label for="tratamiento" class="form-label">Tratamiento Indicado</label>
-                            <textarea class="form-control" id="tratamiento" th:field="*{tratamiento}" 
-                                      rows="3" placeholder="Describa el tratamiento a seguir..."></textarea>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="medicamentos" class="form-label">Medicamentos (separados por coma)</label>
-                            <input type="text" class="form-control" id="medicamentos-input" 
-                                   placeholder="Ej: Paracetamol 500mg, Ibuprofeno 400mg">
-                            <input type="hidden" th:field="*{medicamentos}">
-                            <small class="text-muted">Ingrese los medicamentos separados por comas</small>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="recomendaciones" class="form-label">Recomendaciones</label>
-                            <textarea class="form-control" id="recomendaciones" th:field="*{recomendaciones}" 
-                                      rows="3" placeholder="Recomendaciones para el paciente..."></textarea>
-                        </div>
-                        
-                        <!-- Exámenes -->
-                        <div class="mb-4">
-                            <label for="examenesOrdenados" class="form-label">Exámenes Ordenados (separados por coma)</label>
-                            <input type="text" class="form-control" id="examenes-input" 
-                                   placeholder="Ej: Hemograma completo, Radiografía de tórax">
-                            <input type="hidden" th:field="*{examenesOrdenados}">
-                            <small class="text-muted">Ingrese los exámenes separados por comas</small>
-                        </div>
-                        
-                        <!-- Observaciones -->
-                        <div class="mb-4">
-                            <label for="observaciones" class="form-label">Observaciones Adicionales</label>
-                            <textarea class="form-control" id="observaciones" th:field="*{observaciones}" 
-                                      rows="2" placeholder="Cualquier observación adicional..."></textarea>
-                        </div>
-                        
-                        <!-- Botones -->
-                        <div class="d-flex justify-content-between">
-                            <a th:href="@{/doctor/citas/{id}(id=${cita.id})}" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-left"></i> Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-doctor">
-                                <i class="bi bi-save"></i> Guardar Diagnóstico
-                            </button>
-                        </div>
-                    </form>
-                    
+    <div class="container-custom">
+        <!-- Header -->
+        <div class="card animate-fade-in mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-1 fw-bold">
+                            <i class="bi bi-file-medical-fill text-primary"></i> Registrar Diagnóstico Médico
+                        </h3>
+                        <p class="text-muted mb-0">Complete la información clínica del paciente</p>
+                    </div>
+                    <a th:href="@{/doctor/citas}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
                 </div>
             </div>
         </div>
-        
-        <!-- Información de la Cita y Paciente -->
-        <div class="col-lg-4">
-            <!-- Cita -->
-            <div class="card mb-4">
-                <div class="card-header bg-white py-3">
-                    <h6 class="mb-0 fw-bold">
-                        <i class="bi bi-calendar-check text-primary"></i> Información de la Cita
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <p class="mb-2">
-                        <i class="bi bi-calendar3"></i> 
-                        <span th:text="${#temporals.format(cita.horario.fecha, 'dd/MM/yyyy')}"></span>
-                    </p>
-                    <p class="mb-2">
-                        <i class="bi bi-clock"></i>
-                        <span th:text="${#temporals.format(cita.horario.horaInicio, 'HH:mm')}"></span>
-                        - 
-                        <span th:text="${#temporals.format(cita.horario.horaFin, 'HH:mm')}"></span>
-                    </p>
-                    <p class="mb-0" th:if="${cita.motivoConsulta}">
-                        <strong>Motivo:</strong><br>
-                        <span th:text="${cita.motivoConsulta}"></span>
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Paciente -->
-            <div class="card" th:if="${paciente != null}">
-                <div class="card-header bg-white py-3">
-                    <h6 class="mb-0 fw-bold">
-                        <i class="bi bi-person-fill text-primary"></i> Paciente
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="text-center mb-3">
-                        <div class="avatar-circle-large bg-primary text-white mx-auto mb-2">
-                            <i class="bi bi-person-fill fs-1"></i>
+
+        <!-- Alerts -->
+        <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show animate-fade-in" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show animate-fade-in" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Formulario Principal -->
+            <div class="col-lg-8 mb-4">
+                <div class="card animate-fade-in">
+                    <div class="card-header text-white"
+                        style="background: linear-gradient(135deg, #2a5298 0%, #4facfe 100%); padding: 2rem;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center justify-content-center"
+                                style="width: 60px; height: 60px; background: rgba(255, 255, 255, 0.2); border-radius: 15px;">
+                                <i class="bi bi-file-medical-fill fs-2"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1 fw-bold">Registro de Diagnóstico Médico</h5>
+                                <p class="mb-0 opacity-90">Complete la información clínica del paciente</p>
+                            </div>
                         </div>
-                        <h6 class="fw-bold" th:text="${paciente.nombreCompleto}"></h6>
                     </div>
-                    
-                    <ul class="list-unstyled small">
-                        <li class="mb-2">
-                            <strong>Documento:</strong><br>
-                            <span th:text="${paciente.numeroDocumento}"></span>
-                        </li>
-                        <li class="mb-2">
-                            <strong>Edad:</strong> <span th:text="${paciente.edad} + ' años'"></span>
-                        </li>
-                        <li class="mb-2" th:if="${paciente.informacionMedica?.tipoSangre}">
-                            <strong>Tipo de Sangre:</strong> 
-                            <span th:text="${paciente.informacionMedica.tipoSangre}"></span>
-                        </li>
-                        <li th:if="${paciente.informacionMedica?.alergias != null and !paciente.informacionMedica.alergias.empty}">
-                            <strong class="text-danger">Alergias:</strong><br>
-                            <span class="text-danger" th:each="alergia, iterStat : ${paciente.informacionMedica.alergias}">
-                                <span th:text="${alergia}"></span>
-                                <span th:if="${!iterStat.last}">, </span>
-                            </span>
-                        </li>
-                    </ul>
+
+                    <div class="card-body">
+                        <form th:action="@{/doctor/diagnosticos/guardar}" th:object="${diagnostico}" method="post">
+
+                            <!-- Campo oculto para citaId -->
+                            <input type="hidden" th:field="*{citaId}" />
+
+                            <!-- Diagnóstico Principal (OBLIGATORIO) -->
+                            <h5 class="section-title section-diag">
+                                <i class="bi bi-clipboard-pulse"></i> Diagnóstico Principal *
+                            </h5>
+                            <div class="mb-4">
+                                <label for="diagnostico" class="form-label">Diagnóstico</label>
+                                <textarea class="form-control" id="diagnostico" th:field="*{diagnostico}" rows="3"
+                                    required placeholder="Ej: Hipertensión arterial grado II..."></textarea>
+                                <div class="form-text">Campo obligatorio</div>
+                            </div>
+
+                            <!-- Síntomas -->
+                            <h5 class="section-title section-sint">
+                                <i class="bi bi-thermometer-half"></i> Síntomas Reportados
+                            </h5>
+                            <div class="mb-4">
+                                <label for="sintomas" class="form-label">Síntomas</label>
+                                <textarea class="form-control" id="sintomas" th:field="*{sintomas}" rows="3"
+                                    placeholder="Ej: Dolor de cabeza, mareos, fatiga..."></textarea>
+                            </div>
+
+                            <!-- Tratamiento -->
+                            <h5 class="section-title section-trat">
+                                <i class="bi bi-capsule"></i> Tratamiento Prescrito
+                            </h5>
+                            <div class="mb-4">
+                                <label for="tratamiento" class="form-label">Tratamiento</label>
+                                <textarea class="form-control" id="tratamiento" th:field="*{tratamiento}" rows="3"
+                                    placeholder="Ej: Enalapril 10mg cada 12 horas..."></textarea>
+                            </div>
+
+                            <!-- Recomendaciones -->
+                            <h5 class="section-title section-reco">
+                                <i class="bi bi-lightbulb-fill"></i> Recomendaciones Médicas
+                            </h5>
+                            <div class="mb-4">
+                                <label for="recomendaciones" class="form-label">Recomendaciones</label>
+                                <textarea class="form-control" id="recomendaciones" th:field="*{recomendaciones}"
+                                    rows="3" placeholder="Ej: Dieta baja en sodio, ejercicio moderado..."></textarea>
+                            </div>
+
+                            <!-- Signos Vitales -->
+                            <h5 class="section-title section-vital">
+                                <i class="bi bi-heart-pulse-fill"></i> Signos Vitales
+                            </h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <div class="vital-input-group">
+                                        <label for="presionArterial" class="form-label">
+                                            <i class="bi bi-activity text-danger"></i> Presión Arterial
+                                        </label>
+                                        <input type="text" class="form-control" id="presionArterial"
+                                            th:field="*{presionArterial}" placeholder="Ej: 120/80">
+                                        <small class="form-text text-muted">mmHg</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="vital-input-group">
+                                        <label for="temperatura" class="form-label">
+                                            <i class="bi bi-thermometer text-warning"></i> Temperatura
+                                        </label>
+                                        <input type="number" step="0.1" class="form-control" id="temperatura"
+                                            th:field="*{temperatura}" placeholder="Ej: 36.5">
+                                        <small class="form-text text-muted">°C</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="vital-input-group">
+                                        <label for="frecuenciaCardiaca" class="form-label">
+                                            <i class="bi bi-heart-pulse text-info"></i> Frecuencia Cardíaca
+                                        </label>
+                                        <input type="number" class="form-control" id="frecuenciaCardiaca"
+                                            th:field="*{frecuenciaCardiaca}" placeholder="Ej: 72">
+                                        <small class="form-text text-muted">latidos por minuto</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="vital-input-group">
+                                        <label for="peso" class="form-label">
+                                            <i class="bi bi-speedometer2 text-success"></i> Peso
+                                        </label>
+                                        <input type="number" step="0.1" class="form-control" id="peso"
+                                            th:field="*{peso}" placeholder="Ej: 70.5">
+                                        <small class="form-text text-muted">kg</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="d-flex justify-content-between mt-5">
+                                <a th:href="@{/doctor/citas}" class="btn btn-outline-secondary btn-lg">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-doctor btn-lg">
+                                    <i class="bi bi-check-circle"></i> Guardar Diagnóstico
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
-</div>
 
-<style>
-    .avatar-circle-large {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-</style>
-
-<!-- Scripts -->
-<div th:replace="~{doctor/layout-doctor :: scripts}"></div>
-
-<script>
-    // Convertir campos de texto separados por comas a listas
-    document.addEventListener('DOMContentLoaded', function() {
-        // Medicamentos
-        const medicamentosInput = document.getElementById('medicamentos-input');
-        const medicamentosHidden = document.querySelector('input[name="medicamentos"]');
-        
-        medicamentosInput.addEventListener('change', function() {
-            const medicamentos = this.value.split(',').map(m => m.trim()).filter(m => m !== '');
-            medicamentosHidden.value = JSON.stringify(medicamentos);
-        });
-        
-        // Exámenes
-        const examenesInput = document.getElementById('examenes-input');
-        const examenesHidden = document.querySelector('input[name="examenesOrdenados"]');
-        
-        examenesInput.addEventListener('change', function() {
-            const examenes = this.value.split(',').map(e => e.trim()).filter(e => e !== '');
-            examenesHidden.value = JSON.stringify(examenes);
-        });
-        
-        // Validar formulario antes de enviar
-        document.querySelector('form').addEventListener('submit', function(e) {
-            // Actualizar campos ocultos
-            medicamentosInput.dispatchEvent(new Event('change'));
-            examenesInput.dispatchEvent(new Event('change'));
-        });
-    });
-</script>
-
+    <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
 </body>
+
 </html>

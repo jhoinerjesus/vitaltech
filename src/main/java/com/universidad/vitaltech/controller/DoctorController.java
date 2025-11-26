@@ -1,22 +1,36 @@
 package com.universidad.vitaltech.controller;
 
-import com.universidad.vitaltech.config.CustomUserDetails;
-import com.universidad.vitaltech.model.*;
-import com.universidad.vitaltech.service.CitaService;
-import com.universidad.vitaltech.service.DiagnosticoService;
-import com.universidad.vitaltech.service.HorarioDisponibleService;
-import com.universidad.vitaltech.service.UsuarioService;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import com.universidad.vitaltech.config.CustomUserDetails;
+import com.universidad.vitaltech.model.Cita;
+import com.universidad.vitaltech.model.Diagnostico;
+import com.universidad.vitaltech.model.EstadoCita;
+import com.universidad.vitaltech.model.HorarioDisponible;
+import com.universidad.vitaltech.model.Usuario;
+import com.universidad.vitaltech.service.CitaService;
+import com.universidad.vitaltech.service.DiagnosticoService;
+import com.universidad.vitaltech.service.HorarioDisponibleService;
+import com.universidad.vitaltech.service.UsuarioService;
 
 @Controller
 @RequestMapping("/doctor")
@@ -54,27 +68,156 @@ public class DoctorController {
 
     @GetMapping("/citas")
     public String verCitas(@RequestParam(required = false) String fecha,
-                           Model model,
-                           Authentication authentication) {
+            @RequestParam(required = false) String filtro,
+            Model model,
+            Authentication authentication) {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String doctorId = userDetails.getId();
 
-        List<Cita> citas = (fecha != null && !fecha.isEmpty())
-                ? citaService.listarPorDoctorYFecha(doctorId, LocalDate.parse(fecha))
-                : citaService.listarPorDoctor(doctorId);
+        System.out.println("========================================");
+        System.out.println("🚀 INICIO DEL MÉTODO verCitas()");
+        System.out.println("   Doctor ID: " + doctorId);
+        System.out.println("   Fecha: " + fecha);
+        System.out.println("   Filtro: " + filtro);
+        System.out.println("========================================");
 
-        model.addAttribute("citas", citas);
-        model.addAttribute("fechaSeleccionada", fecha);
+        List<Cita> todasLasCitas;
+
+        // Si hay filtro de fecha específica
+        if (fecha != null && !fecha.isEmpty()) {
+            todasLasCitas = citaService.listarPorDoctorYFecha(doctorId, LocalDate.parse(fecha));
+        } else {
+            todasLasCitas = citaService.listarPorDoctor(doctorId);
+        }
+
+        // IMPORTANTE: Validar que no sea null
+        if (todasLasCitas == null) {
+            todasLasCitas = new ArrayList<>();
+        }
+
+        System.out.println("📊 Total citas del doctor: " + todasLasCitas.size());
+
+        LocalDate hoy = LocalDate.now();
+
+        // Clasificar las citas
+        List<Cita> citasHoy = new ArrayList<>();
+        List<Cita> citasProximas = new ArrayList<>();
+        List<Cita> citasAntiguas = new ArrayList<>();
+
+        for (Cita cita : todasLasCitas) {
+            LocalDate fechaCita = cita.getHorario().getFecha();
+
+            if (fechaCita.equals(hoy)) {
+                citasHoy.add(cita);
+            } else if (fechaCita.isAfter(hoy)) {
+                citasProximas.add(cita);
+            } else {
+                citasAntiguas.add(cita);
+            }
+        }
+
+        citasHoy.sort((c1, c2) -> c1.getHorario().getHoraInicio().compareTo(c2.getHorario().getHoraInicio()));
+        citasProximas.sort((c1, c2) -> c1.getHorario().getFecha().compareTo(c2.getHorario().getFecha()));
+        citasAntiguas.sort((c1, c2) -> c2.getHorario().getFecha().compareTo(c1.getHorario().getFecha()));
+
+        System.out.println("📅 Citas HOY: " + citasHoy.size());
+        System.out.println("📅 Citas PRÓXIMAS: " + citasProximas.size());
+        System.out.println("📅 Citas ANTIGUAS: " + citasAntiguas.size());
+
+        List<Cita> citasMostrar;
+        String filtroActivo = filtro != null ? filtro : "hoy";
+
+        switch (filtroActivo) {
+            case "proximas":
+                citasMostrar = citasProximas;
+                break;
+            case "antiguas":
+                citasMostrar = citasAntiguas;
+                break;
+            case "todas":
+                citasMostrar = todasLasCitas;
+                break;
+            default:
+                citasMostrar = citasHoy;
+                break;
+        }
+
+        System.out.println("========================================");
+        System.out.println("🔍 Filtro activo: " + filtroActivo);
+        System.out.println("🔍 Citas a mostrar: " + citasMostrar.size());
+        System.out.println("========================================");
+
+        // CARGAR INFORMACIÓN COMPLETA DE PACIENTES (nombre Y documento)
+        Map<String, String> nombresPacientes = new HashMap<>();
+        Map<String, String> documentosPacientes = new HashMap<>();
+
+        System.out.println("👥 Iniciando carga de información de pacientes...");
+
+        for (Cita cita : citasMostrar) {
+            System.out.println("📋 Procesando cita ID: " + cita.getId());
+            System.out.println("   - Paciente ID: " + cita.getPacienteId());
+            System.out.println("   - Es null?: " + (cita.getPacienteId() == null));
+
+            if (cita.getPacienteId() != null && !nombresPacientes.containsKey(cita.getPacienteId())) {
+                try {
+                    System.out.println("🔍 Buscando paciente con ID: " + cita.getPacienteId());
+                    Optional<Usuario> pacienteOpt = usuarioService.buscarPorId(cita.getPacienteId());
+
+                    if (pacienteOpt.isPresent()) {
+                        Usuario paciente = pacienteOpt.get();
+                        System.out.println("✅ Paciente encontrado: " + paciente.getNombreCompleto());
+                        System.out.println("   - Documento: " + paciente.getNumeroDocumento());
+                        // Guardar nombre completo
+                        nombresPacientes.put(paciente.getId(), paciente.getNombreCompleto());
+                        // Guardar número de documento
+                        documentosPacientes.put(paciente.getId(), paciente.getNumeroDocumento());
+                    } else {
+                        System.out.println("❌ Paciente NO encontrado con ID: " + cita.getPacienteId());
+                        // Fallback si no se encuentra el paciente
+                        nombresPacientes.put(cita.getPacienteId(), "Paciente no encontrado");
+                        documentosPacientes.put(cita.getPacienteId(), "N/A");
+                    }
+                } catch (Exception e) {
+                    System.out.println("💥 Error al buscar paciente: " + e.getMessage());
+                    e.printStackTrace();
+                    // Si falla, poner valores por defecto
+                    nombresPacientes.put(cita.getPacienteId(), "Error al cargar paciente");
+                    documentosPacientes.put(cita.getPacienteId(), "N/A");
+                }
+            } else {
+                System.out.println("⚠️ PacienteId es NULL o ya está en cache");
+            }
+        }
+
+        System.out.println("========================================");
+        System.out.println("📊 Total pacientes cargados: " + nombresPacientes.size());
+        System.out.println("📊 Nombres: " + nombresPacientes);
+        System.out.println("📊 Documentos: " + documentosPacientes);
+        System.out.println("========================================");
+
+        // SIEMPRE agregar todos los atributos al modelo
+        model.addAttribute("citas", citasMostrar != null ? citasMostrar : new ArrayList<>());
+        model.addAttribute("nombresPacientes", nombresPacientes);
+        model.addAttribute("documentosPacientes", documentosPacientes);
+        model.addAttribute("fechaSeleccionada", fecha != null ? fecha : "");
+        model.addAttribute("filtroActivo", filtroActivo);
+        model.addAttribute("totalHoy", citasHoy.size());
+        model.addAttribute("totalProximas", citasProximas.size());
+        model.addAttribute("totalAntiguas", citasAntiguas.size());
+        model.addAttribute("totalTodas", todasLasCitas.size());
+
+        System.out.println("🏁 FIN DEL MÉTODO verCitas()");
+        System.out.println("========================================");
 
         return "doctor/citas";
     }
 
     @GetMapping("/citas/{id}")
     public String verCita(@PathVariable String id,
-                          Model model,
-                          RedirectAttributes redirectAttributes,
-                          Authentication authentication) {
+            Model model,
+            RedirectAttributes redirectAttributes,
+            Authentication authentication) {
 
         Optional<Cita> citaOpt = citaService.buscarPorId(id);
         if (citaOpt.isEmpty()) {
@@ -102,9 +245,9 @@ public class DoctorController {
 
     @GetMapping("/citas/{id}/diagnostico")
     public String crearDiagnosticoForm(@PathVariable String id,
-                                       Model model,
-                                       RedirectAttributes redirectAttributes,
-                                       Authentication authentication) {
+            Model model,
+            RedirectAttributes redirectAttributes,
+            Authentication authentication) {
 
         Optional<Cita> citaOpt = citaService.buscarPorId(id);
         if (citaOpt.isEmpty()) {
@@ -120,9 +263,9 @@ public class DoctorController {
             return "redirect:/doctor/citas";
         }
 
-        // ✅ CORRECCIÓN IMPORTANTE
-        if (cita.getEstado() != EstadoCita.CONFIRMADA) {
-            redirectAttributes.addFlashAttribute("error", "La cita debe estar CONFIRMADA para registrar diagnóstico");
+        if (!citaService.puedeSerAtendida(cita)) {
+            String mensajeBloqueo = citaService.obtenerMensajeBloqueo(cita);
+            redirectAttributes.addFlashAttribute("error", mensajeBloqueo);
             return "redirect:/doctor/citas/" + id;
         }
 
@@ -147,7 +290,7 @@ public class DoctorController {
 
     @PostMapping("/diagnostico/guardar")
     public String guardarDiagnostico(@ModelAttribute Diagnostico diagnostico,
-                                     RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
         try {
             diagnosticoService.guardar(diagnostico);
             citaService.completarCita(diagnostico.getCitaId());
@@ -171,7 +314,28 @@ public class DoctorController {
     @GetMapping("/horarios")
     public String verHorarios(Model model, Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        model.addAttribute("horarios", horarioDisponibleService.listarActivosPorDoctor(userDetails.getId()));
+        List<HorarioDisponible> horarios = horarioDisponibleService.listarActivosPorDoctor(userDetails.getId());
+
+        // Crear un mapa para determinar el estado de cada horario
+        Map<String, String> estadosHorarios = new HashMap<>();
+        LocalDate hoy = LocalDate.now();
+        LocalTime ahora = LocalTime.now();
+        DayOfWeek diaActual = hoy.getDayOfWeek();
+
+        for (HorarioDisponible horario : horarios) {
+            String estado = "Activo";
+
+            // Si el horario es para hoy y ya pasó la hora de fin
+            if (horario.getDiaSemana().equals(diaActual) && ahora.isAfter(horario.getHoraFin())) {
+                estado = "Finalizado";
+            }
+
+            estadosHorarios.put(horario.getId(), estado);
+        }
+
+        model.addAttribute("horarios", horarios);
+        model.addAttribute("estadosHorarios", estadosHorarios);
+
         return "doctor/horarios";
     }
 
@@ -184,14 +348,52 @@ public class DoctorController {
 
     @PostMapping("/horarios/guardar")
     public String guardarHorario(@ModelAttribute HorarioDisponible horario,
-                                 RedirectAttributes redirectAttributes,
-                                 Authentication authentication) {
+            RedirectAttributes redirectAttributes,
+            Authentication authentication) {
         try {
+            // Debug: Imprimir datos recibidos
+            System.out.println("========================================");
+            System.out.println("🕐 GUARDANDO HORARIO");
+            System.out.println("   Día Semana: " + horario.getDiaSemana());
+            System.out.println("   Hora Inicio: " + horario.getHoraInicio());
+            System.out.println("   Hora Fin: " + horario.getHoraFin());
+            System.out.println("   Duración Cita: " + horario.getDuracionCita());
+            System.out.println("   Activo: " + horario.isActivo());
+            System.out.println("========================================");
+
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             horario.setDoctorId(userDetails.getId());
+
+            // Validaciones básicas
+            if (horario.getDiaSemana() == null) {
+                redirectAttributes.addFlashAttribute("error", "Debe seleccionar un día de la semana");
+                return "redirect:/doctor/horarios/nuevo";
+            }
+
+            if (horario.getHoraInicio() == null || horario.getHoraFin() == null) {
+                redirectAttributes.addFlashAttribute("error", "Las horas son obligatorias");
+                return "redirect:/doctor/horarios/nuevo";
+            }
+
+            if (horario.getHoraInicio().isAfter(horario.getHoraFin()) ||
+                    horario.getHoraInicio().equals(horario.getHoraFin())) {
+                redirectAttributes.addFlashAttribute("error", "La hora de inicio debe ser antes de la hora de fin");
+                return "redirect:/doctor/horarios/nuevo";
+            }
+
+            if (horario.getDuracionCita() == null || horario.getDuracionCita() <= 0) {
+                redirectAttributes.addFlashAttribute("error", "La duración de la cita es obligatoria");
+                return "redirect:/doctor/horarios/nuevo";
+            }
+
             horarioDisponibleService.guardar(horario);
+
+            System.out.println("✅ Horario guardado exitosamente con ID: " + horario.getId());
             redirectAttributes.addFlashAttribute("mensaje", "Horario guardado exitosamente");
+
         } catch (Exception e) {
+            System.out.println("❌ ERROR al guardar horario:");
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Error al guardar horario: " + e.getMessage());
             return "redirect:/doctor/horarios/nuevo";
         }
@@ -200,8 +402,8 @@ public class DoctorController {
 
     @GetMapping("/horarios/eliminar/{id}")
     public String eliminarHorario(@PathVariable String id,
-                                  RedirectAttributes redirectAttributes,
-                                  Authentication authentication) {
+            RedirectAttributes redirectAttributes,
+            Authentication authentication) {
         try {
             Optional<HorarioDisponible> horarioOpt = horarioDisponibleService.buscarPorId(id);
             if (horarioOpt.isEmpty()) {

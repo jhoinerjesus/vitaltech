@@ -1,19 +1,14 @@
 package com.universidad.vitaltech.repository;
 
-import com.universidad.vitaltech.model.HorarioDisponible;
-import org.springframework.data.mongodb.repository.Aggregation;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.stereotype.Repository;
-
 import java.time.DayOfWeek;
 import java.util.List;
-import java.util.Optional;
 
-/**
- * Repositorio para la entidad HorarioDisponible
- * Incluye queries con $lookup para relacionar con Usuario (Doctor)
- */
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+import com.universidad.vitaltech.model.HorarioDisponible;
+
 @Repository
 public interface HorarioDisponibleRepository extends MongoRepository<HorarioDisponible, String> {
     
@@ -24,10 +19,10 @@ public interface HorarioDisponibleRepository extends MongoRepository<HorarioDisp
     List<HorarioDisponible> findByDoctorIdAndActivoTrue(String doctorId);
     
     // Buscar horarios por doctor y día de la semana
-    Optional<HorarioDisponible> findByDoctorIdAndDiaSemana(String doctorId, DayOfWeek diaSemana);
+    List<HorarioDisponible> findByDoctorIdAndDiaSemana(String doctorId, DayOfWeek diaSemana);
     
-    // Buscar horarios activos por doctor y día de la semana
-    Optional<HorarioDisponible> findByDoctorIdAndDiaSemanaAndActivoTrue(String doctorId, DayOfWeek diaSemana);
+    // CAMBIO: Ahora devuelve List en lugar de Optional
+    List<HorarioDisponible> findByDoctorIdAndDiaSemanaAndActivoTrue(String doctorId, DayOfWeek diaSemana);
     
     // Buscar todos los horarios activos por día de la semana
     List<HorarioDisponible> findByDiaSemanaAndActivoTrue(DayOfWeek diaSemana);

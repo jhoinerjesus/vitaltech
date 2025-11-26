@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Diagnosticos - Doctor</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #4facfe 100%);
+            min-height: 100vh;
+            padding: 30px;
+        }
+        
+        .main-header {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            background: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .btn-doctor {
+            background: linear-gradient(135deg, #2a5298 0%, #4facfe 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-doctor:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+        }
+        
+        .diag-section {
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+        
+        .bg-diag {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left-color: #2196f3;
+        }
+        
+        .bg-sint {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left-color: #ff9800;
+        }
+        
+        .bg-trat {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            border-left-color: #9c27b0;
+        }
+        
+        .bg-reco {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left-color: #4caf50;
+        }
+        
+        .vital-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #f0f0f0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            color: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="main-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-2 fw-bold">
+                    <i class="bi bi-file-medical text-primary"></i> Mis Diagnósticos
+                </h3>
+                <p class="mb-0 text-muted">Historial completo de diagnósticos registrados</p>
+            </div>
+            <div>
+                <span class="badge bg-primary fs-5 px-4 py-2 me-2">
+                    <span th:text="${diagnosticos != null ? diagnosticos.size() : 0}">0</span> Total
+                </span>
+                <a th:href="@{/doctor/dashboard}" class="btn btn-doctor">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Empty State -->
+    <div th:if="${diagnosticos == null or diagnosticos.isEmpty()}" class="card">
+        <div class="card-body empty-state">
+            <i class="bi bi-file-medical-fill"></i>
+            <h4 class="mt-4 fw-bold">No hay diagnósticos registrados</h4>
+            <p class="text-muted mb-4">Los diagnósticos que registres aparecerán aquí</p>
+            <a th:href="@{/doctor/citas}" class="btn btn-doctor btn-lg">
+                <i class="bi bi-calendar-check"></i> Ver Citas Pendientes
+            </a>
+        </div>
+    </div>
+    
+    <!-- Lista de Diagnósticos -->
+    <div th:unless="${diagnosticos == null or diagnosticos.isEmpty()}">
+        <div class="card" th:each="d : ${diagnosticos}">
+            <div class="card-body p-4">
+                <div class="row">
+                    <!-- Contenido Principal -->
+                    <div class="col-lg-9">
+                        <!-- Encabezado con Fecha -->
+                        <div class="d-flex align-items-center mb-4 pb-3" style="border-bottom: 2px solid #f0f0f0;">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" 
+                                 style="width: 55px; height: 55px;">
+                                <i class="bi bi-file-medical-fill fs-3"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1 fw-bold">
+                                    Diagnóstico Médico
+                                </h5>
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar3"></i>
+                                    <span th:text="${#temporals.format(d.fechaCreacion, 'dd/MM/yyyy')}">Fecha</span>
+                                    <i class="bi bi-clock ms-2"></i>
+                                    <span th:text="${#temporals.format(d.fechaCreacion, 'HH:mm')}">Hora</span>
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Diagnóstico Principal -->
+                        <div class="diag-section bg-diag">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-clipboard-pulse text-primary me-2 fs-5"></i>
+                                <strong class="text-primary">Diagnóstico Principal:</strong>
+                            </div>
+                            <p class="mb-0 ms-4" th:text="${d.diagnostico}">Diagnóstico del paciente</p>
+                        </div>
+                        
+                        <!-- Síntomas -->
+                        <div th:if="${d.sintomas != null and !d.sintomas.isEmpty()}" class="diag-section bg-sint">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-thermometer-half text-warning me-2 fs-5"></i>
+                                <strong class="text-warning">Síntomas Reportados:</strong>
+                            </div>
+                            <p class="mb-0 ms-4" th:text="${d.sintomas}">Síntomas</p>
+                        </div>
+                        
+                        <!-- Tratamiento -->
+                        <div th:if="${d.tratamiento != null and !d.tratamiento.isEmpty()}" class="diag-section bg-trat">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-capsule me-2 fs-5" style="color: #9c27b0;"></i>
+                                <strong style="color: #9c27b0;">Tratamiento Prescrito:</strong>
+                            </div>
+                            <p class="mb-0 ms-4" th:text="${d.tratamiento}">Tratamiento</p>
+                        </div>
+                        
+                        <!-- Recomendaciones -->
+                        <div th:if="${d.recomendaciones != null and !d.recomendaciones.isEmpty()}" class="diag-section bg-reco">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-lightbulb-fill text-success me-2 fs-5"></i>
+                                <strong class="text-success">Recomendaciones Médicas:</strong>
+                            </div>
+                            <p class="mb-0 ms-4" th:text="${d.recomendaciones}">Recomendaciones</p>
+                        </div>
+                        
+                        <!-- Signos Vitales -->
+                        <div th:if="${d.presionArterial != null or d.temperatura != null or d.frecuenciaCardiaca != null or d.peso != null}">
+                            <h6 class="fw-bold mb-3 mt-4">
+                                <i class="bi bi-heart-pulse-fill text-danger"></i> Signos Vitales Registrados
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3" th:if="${d.presionArterial != null}">
+                                    <div class="vital-card" style="background: #ffebee;">
+                                        <i class="bi bi-activity text-danger fs-3 d-block mb-2"></i>
+                                        <small class="text-muted d-block mb-1">Presión Arterial</small>
+                                        <strong th:text="${d.presionArterial}">120/80</strong>
+                                        <div class="text-muted small">mmHg</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-6 col-md-3" th:if="${d.temperatura != null}">
+                                    <div class="vital-card" style="background: #fff3e0;">
+                                        <i class="bi bi-thermometer text-warning fs-3 d-block mb-2"></i>
+                                        <small class="text-muted d-block mb-1">Temperatura</small>
+                                        <strong th:text="${d.temperatura}">36.5</strong>
+                                        <div class="text-muted small">°C</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-6 col-md-3" th:if="${d.frecuenciaCardiaca != null}">
+                                    <div class="vital-card" style="background: #e3f2fd;">
+                                        <i class="bi bi-heart-pulse text-info fs-3 d-block mb-2"></i>
+                                        <small class="text-muted d-block mb-1">Frecuencia Cardíaca</small>
+                                        <strong th:text="${d.frecuenciaCardiaca}">72</strong>
+                                        <div class="text-muted small">lpm</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-6 col-md-3" th:if="${d.peso != null}">
+                                    <div class="vital-card" style="background: #e8f5e9;">
+                                        <i class="bi bi-speedometer2 text-success fs-3 d-block mb-2"></i>
+                                        <small class="text-muted d-block mb-1">Peso</small>
+                                        <strong th:text="${d.peso}">70</strong>
+                                        <div class="text-muted small">kg</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar de Acciones -->
+                    <div class="col-lg-3">
+                        <div class="d-grid gap-3">
+                            <div class="text-center p-3 rounded" style="background: #e8f5e9;">
+                                <i class="bi bi-check-circle-fill text-success fs-1 d-block mb-2"></i>
+                                <strong class="text-success">Completado</strong>
+                            </div>
+                            
+                            <a th:href="@{/doctor/citas/{id}(id=${d.citaId})}" 
+                               class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-eye"></i> Ver Cita Relacionada
+                            </a>
+                            
+                            <div class="text-center small text-muted mt-2">
+                                <i class="bi bi-info-circle"></i>
+                                Registrado el<br>
+                                <strong th:text="${#temporals.format(d.fechaCreacion, 'dd/MM/yyyy HH:mm')}">Fecha</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+</html>

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 /**
  * Repositorio para la entidad Diagnostico
- * Incluye queries con $lookup para relacionar con Cita y Usuario
+ * Incluye queries con lookup para relacionar con Cita y Usuario
  */
 @Repository
 public interface DiagnosticoRepository extends MongoRepository<Diagnostico, String> {

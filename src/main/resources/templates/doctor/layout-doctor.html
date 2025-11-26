@@ -189,22 +189,22 @@
     
     <ul class="sidebar-menu">
         <li>
-            <a th:href="@{/doctor/dashboard}" th:classappend="${#httpServletRequest.requestURI.contains('dashboard')} ? 'active' : ''">
+            <a th:href="@{/doctor/dashboard}">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
         </li>
         <li>
-            <a th:href="@{/doctor/citas}" th:classappend="${#httpServletRequest.requestURI.contains('citas')} ? 'active' : ''">
+            <a th:href="@{/doctor/citas}">
                 <i class="bi bi-calendar-check"></i> Mis Citas
             </a>
         </li>
         <li>
-            <a th:href="@{/doctor/diagnosticos}" th:classappend="${#httpServletRequest.requestURI.contains('diagnosticos')} ? 'active' : ''">
+            <a th:href="@{/doctor/diagnosticos}">
                 <i class="bi bi-file-medical"></i> Diagnósticos
             </a>
         </li>
         <li>
-            <a th:href="@{/doctor/horarios}" th:classappend="${#httpServletRequest.requestURI.contains('horarios')} ? 'active' : ''">
+            <a th:href="@{/doctor/horarios}">
                 <i class="bi bi-clock"></i> Horarios
             </a>
         </li>
@@ -213,12 +213,11 @@
         </li>
         <li>
             <form th:action="@{/logout}" method="post" class="m-0">
-                <button type="submit" class="btn btn-link text-white text-decoration-none w-100 text-start p-0">
-                    <a href="#" onclick="this.closest('form').submit(); return false;" style="display: block; padding: 12px 15px;">
-                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-                    </a>
-                </button>
-            </form>
+    <button type="submit" class="w-100 text-start p-0 btn btn-link text-white text-decoration-none">
+        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+    </button>
+    </form>
+
         </li>
     </ul>
 </div>

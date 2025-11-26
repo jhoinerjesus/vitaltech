@@ -1,18 +1,19 @@
 package com.universidad.vitaltech.repository;
 
-import com.universidad.vitaltech.model.Cita;
-import com.universidad.vitaltech.model.EstadoCita;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
+import com.universidad.vitaltech.model.Cita;
+import com.universidad.vitaltech.model.EstadoCita;
 
 /**
  * Repositorio para la entidad Cita
- * Incluye queries con $lookup para relacionar con Usuario
+ * Incluye queries con lookup para relacionar con Usuario
  */
 @Repository
 public interface CitaRepository extends MongoRepository<Cita, String> {
@@ -81,4 +82,5 @@ public interface CitaRepository extends MongoRepository<Cita, String> {
     
     // Contar citas por paciente y estado
     long countByPacienteIdAndEstado(String pacienteId, EstadoCita estado);
+    
 }

@@ -31,9 +31,6 @@ import com.universidad.vitaltech.service.CitaService;
 import com.universidad.vitaltech.service.HorarioDisponibleService;
 import com.universidad.vitaltech.service.UsuarioService;
 
-/**
- * Controlador para funcionalidades de la Recepcionista
- */
 @Controller
 @RequestMapping("/recepcionista")
 public class RecepcionistaController {
@@ -52,52 +49,51 @@ public class RecepcionistaController {
      */
     @GetMapping("/dashboard")
     public String dashboard(Model model, Authentication authentication) {
-    // Obtener el usuario actual
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    String nombreRecepcionista = userDetails.getNombreCompleto();
+        // Obtener el usuario actual
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String nombreRecepcionista = userDetails.getNombreCompleto();
 
-    // Citas del día
-    List<Cita> citasHoy = citaService.listarPorFecha(LocalDate.now());
-    long totalCitasHoy = citasHoy.size();
+        // Citas del día
+        List<Cita> citasHoy = citaService.listarPorFecha(LocalDate.now());
+        long totalCitasHoy = citasHoy.size();
 
-    // Citas pendientes rogramadas o confirmadas
-    long citasPendientes = citaService.listarPorEstado(EstadoCita.PROGRAMADA).size()
-            + citaService.listarPorEstado(EstadoCita.CONFIRMADA).size();
+        // Citas pendientes rogramadas o confirmadas
+        long citasPendientes = citaService.listarPorEstado(EstadoCita.PROGRAMADA).size()
+                + citaService.listarPorEstado(EstadoCita.CONFIRMADA).size();
 
-    // Total de pacientes activos
-    long totalPacientes = usuarioService.listarPacientesActivos().size();
+        // Total de pacientes activos
+        long totalPacientes = usuarioService.listarPacientesActivos().size();
 
-    // Enviar datos al modelo
-    model.addAttribute("nombreRecepcionista", nombreRecepcionista);
-    model.addAttribute("totalCitasHoy", totalCitasHoy);
-    model.addAttribute("totalPacientes", totalPacientes);
-    model.addAttribute("citasPendientes", citasPendientes);
+        // Enviar datos al modelo
+        model.addAttribute("nombreRecepcionista", nombreRecepcionista);
+        model.addAttribute("totalCitasHoy", totalCitasHoy);
+        model.addAttribute("totalPacientes", totalPacientes);
+        model.addAttribute("citasPendientes", citasPendientes);
 
-    return "recepcionista/dashboard";
-}
-
+        return "recepcionista/dashboard";
+    }
 
     /**
      * Buscar pacientes
      */
     @GetMapping("/pacientes")
-        public String buscarPacientes(@RequestParam(required = false) String termino, Model model) {
+    public String buscarPacientes(@RequestParam(required = false) String termino, Model model) {
         List<Usuario> pacientes;
-    
+
         if (termino != null && !termino.isEmpty()) {
-            pacientes = usuarioService.buscarPorTermino(termino);  // ← CAMBIAR AQUÍ
+            pacientes = usuarioService.buscarPorTermino(termino); // ← CAMBIAR AQUÍ
             // Filtrar solo pacientes
             pacientes = pacientes.stream()
-                .filter(Usuario::esPaciente)
-                .toList();
+                    .filter(Usuario::esPaciente)
+                    .toList();
             model.addAttribute("termino", termino);
-    }   else {
+        } else {
             pacientes = usuarioService.listarPacientesActivos();
         }
-    
+
         model.addAttribute("pacientes", pacientes);
-            return "recepcionista/pacientes";
-}       
+        return "recepcionista/pacientes";
+    }
 
     /**
      * Formulario para registrar paciente
@@ -188,18 +184,18 @@ public class RecepcionistaController {
     @GetMapping("/pacientes/{id}")
     public String verPaciente(@PathVariable String id, Model model, RedirectAttributes redirectAttributes) {
         Optional<Usuario> paciente = usuarioService.buscarPorId(id);
-        
+
         if (paciente.isEmpty() || !paciente.get().esPaciente()) {
             redirectAttributes.addFlashAttribute("error", "Paciente no encontrado");
             return "redirect:/recepcionista/pacientes";
         }
-        
+
         // Obtener citas del paciente
         List<Cita> citas = citaService.listarPorPaciente(id);
-        
+
         model.addAttribute("paciente", paciente.get());
         model.addAttribute("citas", citas);
-        
+
         return "recepcionista/paciente-detalle";
     }
 
@@ -208,10 +204,10 @@ public class RecepcionistaController {
      */
     @GetMapping("/citas")
     public String verCitas(@RequestParam(required = false) String fecha,
-                          @RequestParam(required = false) String estado,
-                          Model model) {
+            @RequestParam(required = false) String estado,
+            Model model) {
         List<Cita> citas;
-        
+
         if (fecha != null && !fecha.isEmpty()) {
             LocalDate fechaBuscar = LocalDate.parse(fecha);
             citas = citaService.listarPorFecha(fechaBuscar);
@@ -222,13 +218,13 @@ public class RecepcionistaController {
         } else {
             citas = citaService.listarTodas();
         }
-        
+
         model.addAttribute("citas", citas);
         model.addAttribute("estados", EstadoCita.values());
-        
+
         return "recepcionista/citas";
     }
-    
+
     /**
      * Formulario para crear cita
      */
@@ -236,54 +232,54 @@ public class RecepcionistaController {
     public String nuevaCitaForm(Model model) {
         List<Usuario> pacientes = usuarioService.listarPacientesActivos();
         List<Usuario> doctores = usuarioService.listarDoctoresActivos();
-        
+
         model.addAttribute("cita", new Cita());
         model.addAttribute("pacientes", pacientes);
         model.addAttribute("doctores", doctores);
-        
+
         return "recepcionista/cita-form";
     }
-    
+
     /**
      * Guardar cita
      */
     @PostMapping("/citas/guardar")
     public String guardarCita(@RequestParam String pacienteId,
-                             @RequestParam String doctorId,
-                             @RequestParam String fecha,
-                             @RequestParam String horaInicio,
-                             @RequestParam String horaFin,
-                             @RequestParam String motivoConsulta,
-                             RedirectAttributes redirectAttributes,
-                             Authentication authentication) {
+            @RequestParam String doctorId,
+            @RequestParam String fecha,
+            @RequestParam String horaInicio,
+            @RequestParam String horaFin,
+            @RequestParam String motivoConsulta,
+            RedirectAttributes redirectAttributes,
+            Authentication authentication) {
         try {
             // Crear la cita
             Cita cita = new Cita();
             cita.setPacienteId(pacienteId);
             cita.setDoctorId(doctorId);
             cita.setMotivoConsulta(motivoConsulta);
-            
+
             // Crear horario
             Horario horario = new Horario();
             horario.setFecha(LocalDate.parse(fecha));
             horario.setHoraInicio(LocalTime.parse(horaInicio));
             horario.setHoraFin(LocalTime.parse(horaFin));
-            
+
             cita.setHorario(horario);
-            
+
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             cita.setCreadaPor(userDetails.getId());
-            
+
             // Validar disponibilidad
             if (!citaService.existeDisponibilidad(doctorId, horario.getFecha(), horaInicio)) {
                 redirectAttributes.addFlashAttribute("error", "El horario seleccionado no está disponible");
                 return "redirect:/recepcionista/citas/nueva";
             }
-            
+
             citaService.guardar(cita);
             redirectAttributes.addFlashAttribute("mensaje", "Cita creada exitosamente");
             return "redirect:/recepcionista/citas";
-            
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al crear cita: " + e.getMessage());
             return "redirect:/recepcionista/citas/nueva";
@@ -432,25 +428,32 @@ public class RecepcionistaController {
         return "recepcionista/validar-usuario";
     }
 
-    //ver citas pendientes y confirmadas
-    @GetMapping("/citas/pendientes")    
+    // ver citas pendientes y confirmadas
+    @GetMapping("/citas/pendientes")
     public String citasPendientes(Model model) {
-    // Obtener citas programadas
+        // Obtener citas programadas
         List<Cita> citasProgramadas = citaService.listarPorEstado(EstadoCita.PROGRAMADA);
-    
-    // Obtener citas confirmadas
+
+        // Obtener citas confirmadas
         List<Cita> citasConfirmadas = citaService.listarPorEstado(EstadoCita.CONFIRMADA);
-    
-    // Combinar ambas listas
+
+        // Combinar ambas listas
         List<Cita> citasPendientes = new ArrayList<>();
         citasPendientes.addAll(citasProgramadas);
         citasPendientes.addAll(citasConfirmadas);
-    
-    // Ordenar por fecha
+
+        // Ordenar por fecha
         citasPendientes.sort((c1, c2) -> c1.getHorario().getFecha().compareTo(c2.getHorario().getFecha()));
-    
+
         model.addAttribute("citas", citasPendientes);
-    
+
         return "recepcionista/citas-pendientes";
+    }
+
+    @ModelAttribute
+    public void datosNavbar(Model model, Authentication authentication) {
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            model.addAttribute("nombreUsuario", userDetails.getNombreCompleto());
+        }
     }
 }

@@ -10,7 +10,7 @@ import java.util.Optional;
  */
 public interface DiagnosticoService {
     
-    // CRUD básico
+    // CRUD 
     Diagnostico guardar(Diagnostico diagnostico);
     Optional<Diagnostico> buscarPorId(String id);
     List<Diagnostico> listarTodos();
