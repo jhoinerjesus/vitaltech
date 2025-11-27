@@ -16,13 +16,11 @@ import com.universidad.vitaltech.service.HorarioDisponibleService;
 
 @Service
 public class HorarioDisponibleServiceImpl implements HorarioDisponibleService {
-    
+
     @Autowired
     private HorarioDisponibleRepository horarioDisponibleRepository;
 
-
-    // CRUD 
-
+    // CRUD
 
     @Override
     public HorarioDisponible guardar(HorarioDisponible horario) {
@@ -53,7 +51,6 @@ public class HorarioDisponibleServiceImpl implements HorarioDisponibleService {
     }
 
     // CONSULTAS POR DOCTOR Y DÍA
-  
 
     @Override
     public List<HorarioDisponible> listarPorDoctor(String doctorId) {
@@ -62,13 +59,20 @@ public class HorarioDisponibleServiceImpl implements HorarioDisponibleService {
 
     @Override
     public List<HorarioDisponible> listarActivosPorDoctor(String doctorId) {
-        return horarioDisponibleRepository.findByDoctorIdAndActivoTrue(doctorId);
+        List<HorarioDisponible> lista = horarioDisponibleRepository.findByDoctorIdAndActivoTrue(doctorId);
+
+        // Ordenar por día (1=lunes, 7=domingo)
+        lista.sort((a, b) -> Integer.compare(
+                a.getDiaSemana().getValue(),
+                b.getDiaSemana().getValue()));
+
+        return lista;
     }
 
     @Override
     public Optional<HorarioDisponible> buscarPorDoctorYDia(String doctorId, DayOfWeek diaSemana) {
-        List<HorarioDisponible> horarios = 
-                horarioDisponibleRepository.findByDoctorIdAndDiaSemanaAndActivoTrue(doctorId, diaSemana);
+        List<HorarioDisponible> horarios = horarioDisponibleRepository.findByDoctorIdAndDiaSemanaAndActivoTrue(doctorId,
+                diaSemana);
         return horarios.isEmpty() ? Optional.empty() : Optional.of(horarios.get(0));
     }
 
@@ -125,7 +129,6 @@ public class HorarioDisponibleServiceImpl implements HorarioDisponibleService {
 
     // CONSULTAS CON DETALLES
 
-
     @Override
     public List<Object> obtenerHorariosActivosConDetalles() {
         return horarioDisponibleRepository.findHorariosActivosConDetallesDoctor();
@@ -146,9 +149,7 @@ public class HorarioDisponibleServiceImpl implements HorarioDisponibleService {
         return horarioDisponibleRepository.countByDoctorIdAndActivoTrue(doctorId);
     }
 
-
     // VALIDACIONES PARA CITAS
-
 
     @Override
     public List<LocalTime> obtenerHorariosDisponibles(String doctorId, LocalDate fecha) {
@@ -194,8 +195,8 @@ public class HorarioDisponibleServiceImpl implements HorarioDisponibleService {
 
     @Override
     public List<HorarioDisponible> listarActivosPorDoctorYDia(String doctorId, DayOfWeek dia) {
-        List<HorarioDisponible> lista =
-                horarioDisponibleRepository.findByDoctorIdAndDiaSemanaAndActivoTrue(doctorId, dia);
+        List<HorarioDisponible> lista = horarioDisponibleRepository.findByDoctorIdAndDiaSemanaAndActivoTrue(doctorId,
+                dia);
 
         return lista != null ? lista : List.of();
     }

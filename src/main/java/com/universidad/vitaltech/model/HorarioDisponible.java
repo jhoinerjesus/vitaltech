@@ -95,4 +95,26 @@ public class HorarioDisponible {
         
         return horarios;
     }
+
+    public String getEstado() {
+        LocalDate hoy = LocalDate.now();
+        LocalTime ahora = LocalTime.now();
+
+        if (this.diaSemana.getValue() < hoy.getDayOfWeek().getValue()) {
+            return "Finalizado";
+        }
+
+        if (this.diaSemana.equals(hoy.getDayOfWeek())) {
+            
+                if (ahora.isAfter(this.horaFin) || ahora.equals(this.horaFin)) {
+                    return "Finalizado";
+                }
+        
+                if (ahora.isAfter(this.horaInicio) || ahora.equals(this.horaInicio)) {
+                    return "En curso";
+                }
+            }
+    
+            return "Próximo";
+}
 }

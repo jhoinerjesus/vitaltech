@@ -279,7 +279,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form th:action="@{/doctor/diagnosticos/guardar}" th:object="${diagnostico}" method="post">
+                        <form th:action="@{/doctor/diagnostico/guardar}" th:object="${diagnostico}" method="post">
 
                             <!-- Campo oculto para citaId -->
                             <input type="hidden" th:field="*{citaId}" />

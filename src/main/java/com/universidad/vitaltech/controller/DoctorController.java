@@ -316,18 +316,33 @@ public class DoctorController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         List<HorarioDisponible> horarios = horarioDisponibleService.listarActivosPorDoctor(userDetails.getId());
 
-        // Crear un mapa para determinar el estado de cada horario
         Map<String, String> estadosHorarios = new HashMap<>();
         LocalDate hoy = LocalDate.now();
         LocalTime ahora = LocalTime.now();
         DayOfWeek diaActual = hoy.getDayOfWeek();
 
         for (HorarioDisponible horario : horarios) {
-            String estado = "Activo";
 
-            // Si el horario es para hoy y ya pasó la hora de fin
-            if (horario.getDiaSemana().equals(diaActual) && ahora.isAfter(horario.getHoraFin())) {
-                estado = "Finalizado";
+            String estado = "Proximo";
+
+            // Si el horario es para HOY
+            if (horario.getDiaSemana().equals(diaActual)) {
+
+                if (ahora.isBefore(horario.getHoraInicio())) {
+                    estado = "Proximo"; // aún no empieza
+                } else if (!ahora.isAfter(horario.getHoraFin())) {
+                    estado = "EnCurso"; // estamos entre inicio y fin
+                } else {
+                    estado = "Finalizado"; // ya terminó hoy
+                }
+
+            } else {
+                // Si el día del horario ya pasó en la semana
+                if (horario.getDiaSemana().getValue() < diaActual.getValue()) {
+                    estado = "Finalizado";
+                } else {
+                    estado = "Proximo"; // día aún no ha llegado
+                }
             }
 
             estadosHorarios.put(horario.getId(), estado);
@@ -340,9 +355,13 @@ public class DoctorController {
     }
 
     @GetMapping("/horarios/nuevo")
-    public String nuevoHorarioForm(Model model) {
-        model.addAttribute("horario", new HorarioDisponible());
-        model.addAttribute("diasSemana", DayOfWeek.values());
+    public String nuevoHorario(Model model) {
+        // Crear objeto vacío para el formulario
+        HorarioDisponible horario = new HorarioDisponible();
+        horario.setActivo(true); // valor por defecto
+
+        model.addAttribute("horario", horario);
+
         return "doctor/horario-form";
     }
 
